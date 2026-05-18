@@ -500,7 +500,7 @@ select.form-input{cursor:pointer;}
       <div class="set-sec-t">표시 설정</div>
       <div class="set-card"><div class="set-row"><div class="set-ico" style="background:var(--G2)">🔤</div><div class="set-lbl"><div class="set-lbl-main">큰 글씨 모드</div><div class="set-lbl-sub">어르신·시력 약한 분 권장</div></div><button class="toggle" id="large-tog" onclick="event.stopPropagation();toggleLarge(this)"></button></div></div>
       <div class="set-sec-t">정보</div>
-      <div class="set-card"><div class="set-row"><div class="set-ico" style="background:var(--exhi-bg)">📞</div><div class="set-lbl"><div class="set-lbl-main">문의</div><div class="set-lbl-sub">농촌을담다 제작 | 문의: 061-530-5137</div></div><span class="set-arr">›</span></div><div class="set-row"><div class="set-ico" style="background:var(--fest-bg)">ℹ️</div><div class="set-lbl"><div class="set-lbl-main">버전</div><div class="set-lbl-sub">해남 문화달력 v9.0</div></div></div></div>
+      <div class="set-card"><div class="set-row"><div class="set-ico" style="background:var(--exhi-bg)">📞</div><div class="set-lbl"><div class="set-lbl-main">제작문의</div><div class="set-lbl-sub">농촌을담다 제작</div></div><span class="set-arr">›</span></div><div class="set-row"><div class="set-ico" style="background:var(--fest-bg)">ℹ️</div><div class="set-lbl"><div class="set-lbl-main">버전</div><div class="set-lbl-sub">해남 문화달력 v9.0</div></div></div></div>
       <div class="set-sec-t">관리자</div>
       <div class="set-card"><div class="set-row" onclick="openAdm()"><div class="set-ico" style="background:#1A1A18;font-size:14px">⚙️</div><div class="set-lbl"><div class="set-lbl-main">관리자 시스템</div><div class="set-lbl-sub">행사 등록·수정·숨김 (실무자 전용)</div></div><span class="set-arr">›</span></div></div>
     </div>
@@ -872,8 +872,8 @@ select.form-input{cursor:pointer;}
 // ══════════════════════════════════════════════════════
 var SUPABASE_URL = 'https://qdgxcoqollycryoojwav.supabase.co'; // ← 실제 URL로 교체
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZ3hjb3FvbGx5Y3J5b29qd2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDE3NDgsImV4cCI6MjA5NDMxNzc0OH0.Xqq4i4PZZegJjsA8V_yjMWZd_Y2vnHbrxeoc3FE9cog';               // ← 실제 KEY로 교체
-var USE_DEMO = true; // false로 변경 시 실DB 사용
-var ADM_PASSWORD = '2026haenam!'; // 관리자 비밀번호 (실서비스: 환경변수)
+var USE_DEMO = false; // false로 변경 시 실DB 사용
+var ADM_PASSWORD = 'nongdam2026'; // 관리자 비밀번호 (실서비스: 환경변수)
 
 // Supabase fetch 헬퍼
 function sbFetch(path, opts) {
