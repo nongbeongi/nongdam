@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>해남 문화달력</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─── */
+:root{
+  --perf:#C14B22;--perf-bg:#FDF0EB;
+  --trad:#4A3A9A;--trad-bg:#F0EEFF;
+  --exhi:#1558A0;--exhi-bg:#EAF2FF;
+  --edu:#2A6B1A;--edu-bg:#EDFBE8;
+  --fest:#8A5200;--fest-bg:#FFF7E6;
+  --evt:#555050;--evt-bg:#F1EFE8;
+  --G:#1A6B3C;--G2:#EDF7F0;
+  --bg:#F7F6F2;--card:#fff;
+  --b1:rgba(0,0,0,.09);--b2:rgba(0,0,0,.16);
+  --tx:#1A1A18;--mu:#6B6B65;--hi:#AEAEA8;
+  --red:#C0392B;--red-bg:#FDF0EE;
+  --r:14px;--rsm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:'Noto Sans KR',sans-serif;font-size:16px;}
+body.large{font-size:19px;}
+
+/* ─── 레이아웃 전환: CSS @media 기반 ─── */
+/* 기본(모바일): mobile-app 표시, pc-app 숨김 */
+#mobile-app{display:flex;flex-direction:column;min-height:100vh;background:var(--bg);color:var(--tx);}
+#pc-app{display:none;}
+/* PC(1024px+): 반대 */
+@media(min-width:1024px){
+  #mobile-app{display:none!important;}
+  #pc-app{display:grid!important;grid-template-columns:220px 1fr;grid-template-rows:56px 1fr;min-height:100vh;background:#ECEAE5;color:var(--tx);font-family:'Noto Sans KR',sans-serif;}
+}
+
+/* ─── MOBILE TOPBAR ─── */
+.m-top{background:var(--card);border-bottom:1px solid var(--b1);padding:12px 16px 8px;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.m-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
+.m-logo{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:600;color:var(--G);cursor:pointer;user-select:none;}
+.m-logo small{font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:400;color:var(--hi);margin-left:4px;}
+.large-badge{display:none;font-size:9px;font-weight:700;background:var(--G);color:#fff;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+body.large .large-badge{display:inline-block;}
+.m-icons{display:flex;gap:4px;}
+.ibtn{background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:20px;transition:background .15s;position:relative;}
+.ibtn:hover{background:var(--bg);}
+.ibtn.on{background:var(--G2);color:var(--G);}
+.badge{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#E53535;border:1.5px solid #fff;display:none;}
+.vtabs{display:flex;gap:3px;background:var(--bg);border-radius:10px;padding:3px;}
+.vt{flex:1;border:none;background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;padding:7px 2px;border-radius:8px;color:var(--mu);cursor:pointer;transition:all .18s;}
+.vt.on{background:var(--card);color:var(--G);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+/* ─── MOBILE MAIN ─── */
+#m-main{flex:1;overflow-y:auto;padding-bottom:calc(66px + env(safe-area-inset-bottom,0px));}
+.tab{display:none;padding-bottom:16px;}
+.tab.on{display:block;}
+
+/* ─── MOBILE BOTTOM NAV ─── */
+.m-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--b1);display:flex;justify-content:space-around;padding-top:8px;padding-bottom:max(env(safe-area-inset-bottom,0px),10px);z-index:200;}
+.bn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--mu);border:none;background:none;cursor:pointer;padding:4px 16px;font-family:'Noto Sans KR',sans-serif;transition:color .15s;}
+.bn.on{color:var(--G);}
+.bn-ico{font-size:22px;line-height:1;}
+
+/* ─── TAGS ─── */
+.ctag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.ftag{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--edu-bg);color:var(--edu);font-weight:500;white-space:nowrap;}
+.htag{font-size:10px;padding:3px 8px;border-radius:20px;background:#FFF0EE;color:#C14B22;font-weight:500;white-space:nowrap;}
+.cantag{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--red-bg);color:var(--red);font-weight:700;white-space:nowrap;}
+.feat-badge{display:inline-block;font-size:9px;font-weight:700;background:#F5A623;color:#fff;padding:2px 6px;border-radius:10px;margin-left:5px;vertical-align:middle;}
+
+/* ─── DATE STRIP ─── */
+.strip-wrap{padding:12px 16px 4px;}
+.strip-hint{font-size:10px;color:var(--hi);text-align:center;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.strip-hint::before,.strip-hint::after{content:'';flex:1;height:1px;background:var(--b1);}
+.dstrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.dstrip::-webkit-scrollbar{display:none;}
+.db{flex-shrink:0;width:58px;display:flex;flex-direction:column;align-items:center;padding:9px 4px 8px;border-radius:12px;border:1.5px solid var(--b1);background:var(--card);cursor:pointer;transition:all .15s;}
+.db:hover{border-color:var(--G);}
+.db.cur{border-color:var(--G);background:var(--G2);}
+.db.noev{opacity:.35;}
+.db .dow{font-size:10px;color:var(--mu);margin-bottom:2px;}
+.db .dnum{font-size:18px;font-weight:700;color:var(--tx);line-height:1;margin-bottom:5px;}
+.db.cur .dow,.db.cur .dnum{color:var(--G);}
+.ddots{display:flex;gap:2px;justify-content:center;min-height:8px;align-items:center;}
+.ddot{width:6px;height:6px;border-radius:50%;}
+.cal-more{font-size:8px;font-weight:700;color:var(--G);margin-left:1px;}
+
+/* ─── SECTION HEADER ─── */
+.sec-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 8px;}
+.sec-title{font-size:15px;font-weight:700;}
+.sec-cnt{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--G2);color:var(--G);font-weight:500;}
+
+/* ─── EVENT CARD ─── */
+.evlist{padding:0 12px;display:flex;flex-direction:column;gap:8px;}
+.evc{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);padding:13px 14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;animation:fu .2s ease both;}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.evc:hover{border-color:var(--b2);box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.evc.cancelled{border-color:rgba(192,57,43,.25);background:#FFFAFA;}
+.ev-top{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.ev-tags{display:flex;align-items:center;gap:5px;flex:1;min-width:0;flex-wrap:wrap;}
+.hbtn{flex-shrink:0;background:none;border:none;cursor:pointer;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--hi);font-size:20px;transition:all .15s;}
+.hbtn:hover,.hbtn.on{color:#E04070;}
+.ev-title{font-size:15px;font-weight:700;line-height:1.35;margin-bottom:6px;}
+.ev-title.strike{text-decoration:line-through;color:var(--red);opacity:.7;}
+.ev-meta{font-size:12px;color:var(--mu);display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;line-height:1.5;}
+.ev-bot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);}
+.saves{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mu);}
+.snum{font-weight:700;color:#E04070;}
+.gobt{font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:none;background:var(--G);color:#fff;cursor:pointer;white-space:nowrap;}
+
+/* empty */
+.empty-box{display:flex;flex-direction:column;align-items:center;padding:36px 20px 20px;text-align:center;}
+.empty-ico{font-size:34px;color:var(--hi);margin-bottom:10px;}
+.empty-msg{font-size:13px;color:var(--mu);line-height:1.7;margin-bottom:16px;}
+.near-wrap{width:100%;display:flex;flex-direction:column;gap:6px;}
+.near-item{background:var(--card);border-radius:var(--rsm);border:1px solid var(--b1);padding:10px 13px;cursor:pointer;display:flex;align-items:center;gap:10px;}
+.near-date{font-size:12px;font-weight:700;color:var(--G);min-width:36px;}
+.near-info{flex:1;min-width:0;}
+.near-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.near-sub{font-size:10px;color:var(--mu);}
+
+/* week */
+.week-body{padding:0 12px;}
+.wday{margin-bottom:10px;}
+.wdhd{font-size:11px;font-weight:700;color:var(--mu);padding:6px 0 5px;border-bottom:1px solid var(--b1);margin-bottom:4px;display:flex;justify-content:space-between;}
+.wdhd.tod{color:var(--G);border-color:#B8E6C8;}
+.wdhd.noev{color:var(--hi);}
+.wev{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--b1);cursor:pointer;}
+.wev:last-child{border-bottom:none;}
+.wdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.winfo{flex:1;min-width:0;}
+.wname{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wmeta{font-size:10px;color:var(--mu);}
+.wsaves{font-size:10px;color:#E04070;font-weight:700;white-space:nowrap;}
+.whbt{background:none;border:none;cursor:pointer;color:var(--hi);font-size:16px;padding:3px 5px;}
+.whbt.on,.whbt:hover{color:#E04070;}
+.wk-empty{padding:8px 0;font-size:11px;color:var(--hi);}
+
+/* month */
+.month-body{padding:0 12px;}
+.month-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px;}
+.mnav-btn{background:none;border:1px solid var(--b1);border-radius:8px;padding:5px 12px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;color:var(--mu);}
+.mnav-btn:hover{border-color:var(--G);color:var(--G);}
+.mnav-title{font-size:14px;font-weight:700;}
+.calleg{display:flex;gap:7px;flex-wrap:wrap;padding-bottom:8px;}
+.ll{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--mu);}
+.ldot{width:8px;height:8px;border-radius:50%;}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cdow{font-size:10px;color:var(--mu);text-align:center;padding:4px 0;font-weight:500;}
+.cc{min-height:clamp(40px,11vw,52px);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:5px 2px;cursor:pointer;transition:background .12s;}
+.cc:hover{background:rgba(0,0,0,.05);}
+.cc.tod{background:var(--G2);}
+.cc.sel{outline:2px solid var(--G);background:var(--G2);}
+.cc.emp{opacity:0;pointer-events:none;}
+.cnum{font-size:12px;font-weight:500;color:var(--tx);}
+.cc.tod .cnum,.cc.sel .cnum{color:var(--G);font-weight:700;}
+.cdots{display:flex;align-items:center;justify-content:center;gap:2px;margin-top:3px;min-height:8px;}
+.cdot2{width:5px;height:5px;border-radius:50%;}
+
+/* hot */
+.hotlist{padding:0 12px;display:flex;flex-direction:column;gap:7px;}
+.hitem{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;animation:fu .2s ease both;}
+.hitem:hover{border-color:var(--b2);}
+.hitem.feat{border-color:#F5A623;background:linear-gradient(135deg,#FFFCF5,#FFF7E6);}
+.hrank{font-size:20px;font-weight:700;min-width:26px;color:var(--hi);}
+.hrank.g{color:#C8920A;}.hrank.s{color:#888;}.hrank.b{color:#A0622A;}
+.hinfo{flex:1;min-width:0;}
+.hname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.hsub{font-size:11px;color:var(--mu);display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.hsaves{font-size:13px;font-weight:700;color:#E04070;white-space:nowrap;}
+
+/* map */
+.mf-row{display:flex;gap:6px;padding:10px 12px 4px;overflow-x:auto;scrollbar-width:none;}
+.mf-row::-webkit-scrollbar{display:none;}
+.mfchip{flex-shrink:0;font-size:11px;padding:5px 12px;border-radius:20px;border:1.5px solid var(--b1);background:var(--card);color:var(--mu);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:500;transition:all .15s;}
+.mfchip.on{border-color:var(--G);background:var(--G2);color:var(--G);}
+.map-notice{margin:6px 12px;background:var(--G2);border-radius:8px;padding:7px 12px;font-size:11px;color:var(--G);font-weight:500;}
+.map-box{margin:0 12px;border-radius:var(--r);border:1px solid var(--b1);height:200px;background:linear-gradient(135deg,#E8F5E8,#D4EDDA);position:relative;overflow:hidden;}
+.map-ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;}
+.map-pin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:2;}
+.map-pin-ico{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.25);}
+.map-pin-ico i{transform:rotate(45deg);font-size:11px;}
+.map-pin-lbl{background:var(--card);border:1px solid var(--b1);border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;white-space:nowrap;margin-top:2px;}
+.map-evlist{padding:8px 12px 0;display:flex;flex-direction:column;gap:7px;}
+.map-ev{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);padding:11px 13px;display:flex;gap:10px;cursor:pointer;transition:border-color .15s;}
+.map-ev:hover{border-color:var(--b2);}
+.map-ev-bar{width:4px;border-radius:2px;flex-shrink:0;}
+.map-ev-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.map-ev-meta{font-size:11px;color:var(--mu);}
+.map-ev-dday{font-size:10px;font-weight:700;margin-top:3px;}
+
+/* ─── OVERLAYS ─── */
+.ov{display:none;position:fixed;top:0;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom,0px));background:var(--bg);z-index:150;overflow-y:auto;transform:translateX(100%);opacity:0;transition:transform .22s cubic-bezier(.4,0,.2,1),opacity .22s;}
+.ov.open{display:block;transform:none;opacity:1;}
+.ov-top{background:var(--card);border-bottom:1px solid var(--b1);padding:13px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+.ov-back{background:none;border:none;cursor:pointer;color:var(--mu);font-size:22px;line-height:1;padding:0;}
+.ov-title{font-size:17px;font-weight:700;}
+.ov-sub{font-size:12px;color:var(--mu);margin-left:auto;}
+.ov-body{padding:12px 12px 20px;}
+
+/* saved items */
+.sev{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);padding:13px 14px;margin-bottom:8px;}
+.sev.cancelled{border-color:rgba(192,57,43,.25);}
+.sev-top{display:flex;align-items:center;gap:5px;margin-bottom:6px;flex-wrap:wrap;}
+.dday{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;margin-left:auto;}
+.dday.today{background:var(--G2);color:var(--G);}
+.dday.soon{background:var(--edu-bg);color:var(--edu);}
+.dday.past{background:var(--bg);color:var(--hi);}
+.sev-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+.sev-meta{font-size:11px;color:var(--mu);margin-bottom:2px;}
+.sev-acts{display:flex;gap:6px;margin-top:8px;}
+.sev-btn{flex:1;padding:8px;border-radius:9px;border:1px solid var(--b1);background:var(--card);font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;color:var(--mu);cursor:pointer;text-align:center;}
+.sev-btn:hover{border-color:var(--G);color:var(--G);}
+.sev-del{padding:8px 12px;border-radius:9px;border:none;background:var(--bg);font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--hi);cursor:pointer;}
+.saved-empty{padding:60px 20px;text-align:center;color:var(--mu);font-size:14px;line-height:1.8;}
+
+/* settings */
+.set-card{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);overflow:hidden;margin-bottom:12px;}
+.set-row{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--b1);gap:12px;cursor:pointer;}
+.set-row:last-child{border-bottom:none;}
+.set-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;}
+.set-lbl{flex:1;}
+.set-lbl-main{font-size:14px;font-weight:500;}
+.set-lbl-sub{font-size:11px;color:var(--mu);margin-top:2px;}
+.toggle{width:44px;height:26px;border-radius:13px;background:var(--hi);border:none;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--G);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{transform:translateX(18px);}
+.set-arr{color:var(--hi);font-size:18px;}
+.set-sec-t{font-size:10px;font-weight:700;color:var(--mu);padding:14px 0 6px;letter-spacing:.04em;}
+
+/* ─── MODAL ─── */
+#backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:500;align-items:flex-end;justify-content:center;}
+#backdrop.open{display:flex;}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideUp .22s ease;position:relative;}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--b1);border-radius:2px;margin:0 auto 16px;}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;color:var(--mu);display:flex;align-items:center;justify-content:center;}
+.m-alert{background:var(--red-bg);border:1px solid rgba(192,57,43,.2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--red);font-weight:700;display:none;}
+.m-cat{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.m-title{font-size:20px;font-weight:700;margin-bottom:12px;line-height:1.3;}
+.m-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--b1);font-size:13px;}
+.m-row:last-of-type{border-bottom:none;}
+.m-lbl{color:var(--mu);min-width:46px;flex-shrink:0;}
+.m-val{color:var(--tx);font-weight:500;line-height:1.5;}
+.m-desc{background:var(--bg);border-radius:10px;padding:12px;margin:12px 0;font-size:13px;color:var(--mu);line-height:1.7;}
+.m-saves{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mu);justify-content:center;margin-bottom:14px;}
+.m-saves b{color:#E04070;}
+.m-actions{display:flex;gap:8px;}
+.m-call{flex:1;padding:13px;border-radius:12px;border:1.5px solid var(--b1);background:var(--card);font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.m-call:hover{border-color:var(--G);}
+.m-save{flex:2;padding:13px;border-radius:12px;border:none;background:var(--G);color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.m-save.saved{background:#E04070;}
+
+/* ─── ADMIN MOBILE ─── */
+#adm-mob{display:none;position:fixed;inset:0;background:#F5F4F0;z-index:600;overflow-y:auto;font-family:'Noto Sans KR',sans-serif;}
+#adm-mob.open{display:block;}
+.adm-topbar{background:#1A1A18;padding:13px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:10;}
+.adm-logo{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:600;color:#fff;}
+.adm-logo small{font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:400;color:#8A8A84;margin-left:6px;}
+.adm-exit{background:none;border:1px solid #333;cursor:pointer;color:#8A8A84;font-size:12px;font-weight:700;margin-left:auto;padding:6px 12px;border-radius:8px;font-family:'Noto Sans KR',sans-serif;}
+.adm-body{padding:12px;}
+/* 탭: nowrap + 스크롤 → 2줄 방지 */
+.adm-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:3px;background:#E8E7E3;border-radius:10px;padding:3px;margin-bottom:14px;scrollbar-width:none;}
+.adm-tabs::-webkit-scrollbar{display:none;}
+.adm-vt{flex-shrink:0;border:none;background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:500;padding:7px 12px;border-radius:8px;color:#888;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.adm-vt.on{background:#fff;color:#1A1A18;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+/* adm-sec: 명확한 show/hide */
+.adm-sec{display:none;}
+.adm-sec.on{display:block;}
+.stat4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+.sbox{background:#fff;border-radius:var(--r);border:1px solid var(--b1);padding:14px;text-align:center;}
+.sn{font-size:24px;font-weight:700;}.sl{font-size:11px;color:var(--mu);margin-top:3px;}.sup{font-size:10px;color:var(--edu);margin-top:2px;}
+.menu4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+.menu-card{background:#fff;border-radius:var(--r);border:1px solid var(--b1);padding:14px;cursor:pointer;transition:border-color .15s;}
+.menu-card:hover{border-color:var(--b2);}
+.menu-ico{font-size:22px;margin-bottom:6px;}.menu-name{font-size:13px;font-weight:700;margin-bottom:2px;}.menu-desc{font-size:11px;color:var(--mu);}
+.adm-card{background:#fff;border-radius:var(--r);border:1px solid var(--b1);overflow:hidden;margin-bottom:10px;}
+.adm-row{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--b1);}
+.adm-row:last-child{border-bottom:none;}
+.adm-row.hid{background:#FFFBF0;opacity:.65;}
+.adm-row.can{background:#FDF5F5;opacity:.65;}
+.adm-row.feat{background:#FFFBF0;border-left:3px solid #F5A623;}
+.adm-ev-info{flex:1;min-width:0;}
+.adm-ev-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm-ev-meta{font-size:10px;color:var(--mu);margin-top:1px;}
+.adm-saves{font-size:11px;color:#E04070;font-weight:700;white-space:nowrap;margin-right:3px;}
+.adm-btns{display:flex;gap:3px;flex-shrink:0;}
+.adm-btn{padding:4px 8px;border-radius:6px;border:1px solid var(--b1);background:#fff;font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:700;color:var(--mu);cursor:pointer;white-space:nowrap;}
+.adm-btn.edit{border-color:#B8D4F8;color:var(--exhi);}
+.adm-btn.hide{border-color:#F5D07A;color:#8A5200;}
+.adm-btn.canc{border-color:#F5B0A0;color:#C0392B;}
+.adm-btn.rest{border-color:#A8D8B8;color:#1A6B3C;}
+.adm-btn.hot{border-color:#F5A623;color:#8A5200;}
+.adm-sec-t{font-size:10px;font-weight:700;color:var(--mu);padding:10px 0 6px;letter-spacing:.04em;}
+.adm-status{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.st-pub{background:var(--edu-bg);color:var(--edu);}
+.st-hid{background:#FFF7E6;color:#8A5200;}
+.st-can{background:var(--red-bg);color:var(--red);}
+/* 통계 바 */
+.vis-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.vis-label{font-size:11px;font-weight:500;min-width:72px;}
+.vis-bar-bg{flex:1;background:var(--bg);border-radius:5px;height:8px;}
+.vis-bar{height:8px;border-radius:5px;background:var(--G);transition:width .5s;}
+.vis-num{font-size:11px;font-weight:700;min-width:46px;text-align:right;}
+/* form */
+.form-field{margin-bottom:12px;}
+.form-label{font-size:12px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+.req{color:#E04070;font-size:11px;}
+.form-input{width:100%;padding:11px 12px;border-radius:var(--rsm);border:1.5px solid var(--b1);font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx);background:#fff;outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--G);}
+textarea.form-input{resize:vertical;min-height:80px;line-height:1.6;}
+select.form-input{cursor:pointer;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.form-hint{font-size:11px;color:var(--hi);margin-top:4px;}
+.cat-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.cchip{font-size:12px;padding:7px 13px;border-radius:20px;border:2px solid var(--b1);background:#fff;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:500;color:var(--mu);transition:all .15s;position:relative;}
+.cchip.on{font-weight:700;}
+.target-chip{font-size:12px;padding:7px 13px;border-radius:20px;border:2px solid var(--b1);background:#fff;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:500;color:var(--mu);transition:all .15s;}
+.target-chip.on{font-weight:700;background:var(--edu-bg);border-color:var(--edu);color:var(--edu);}
+.form-actions{display:flex;gap:8px;margin-top:16px;}
+.btn-draft{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--b1);background:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;color:var(--mu);cursor:pointer;}
+.btn-pub{flex:2;padding:12px;border-radius:12px;border:none;background:#1A1A18;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.up-tabs{display:flex;border-bottom:1px solid var(--b1);margin-bottom:14px;}
+.utab{flex:1;padding:9px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--mu);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.utab.on{color:var(--G);border-bottom-color:var(--G);}
+.up-sec{display:none;}.up-sec.on{display:block;}
+.drop-zone{border:2px dashed var(--b1);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;margin-bottom:12px;}
+.drop-zone:hover{border-color:var(--G);}
+.drop-ico{font-size:28px;margin-bottom:7px;}.drop-label{font-size:13px;font-weight:700;margin-bottom:3px;}.drop-sub{font-size:11px;color:var(--mu);}
+.parse-bar{background:var(--G2);border-radius:8px;padding:9px 12px;margin-bottom:9px;font-size:12px;color:var(--G);font-weight:500;display:none;}
+.preview-tbl{border-radius:var(--rsm);border:1px solid var(--b1);overflow:hidden;margin-bottom:9px;display:none;}
+.preview-tbl table{width:100%;font-size:11px;border-collapse:collapse;}
+.preview-tbl th{background:var(--bg);padding:6px 8px;text-align:left;font-weight:700;color:var(--mu);border-bottom:1px solid var(--b1);}
+.preview-tbl td{padding:6px 8px;border-bottom:1px solid var(--b1);}
+.preview-tbl tr:last-child td{border-bottom:none;}
+.form-area{display:none;}
+
+/* ─── TOAST ─── */
+#toast-wrap{position:fixed;bottom:calc(74px + env(safe-area-inset-bottom,0px));left:0;right:0;z-index:999;pointer-events:none;display:flex;justify-content:center;}
+#toast{background:#1A1A18;color:#F7F6F2;font-size:12px;font-weight:500;padding:9px 18px;border-radius:20px;white-space:nowrap;opacity:0;transform:translateY(6px);transition:all .2s;}
+#toast.show{opacity:1;transform:none;}
+
+/* ─── PC LAYOUT (display:grid는 @media에서) ─── */
+.pc-bar{grid-column:1/-1;background:#1A1A18;display:flex;align-items:center;padding:0 20px;gap:16px;position:sticky;top:0;z-index:100;}
+.pc-bar-logo{font-family:'Noto Serif KR',serif;font-size:16px;font-weight:600;color:#fff;}
+.pc-bar-logo small{font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:400;color:#8A8A84;margin-left:5px;}
+.pc-bar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.pc-pill{font-size:11px;color:#8A8A84;background:rgba(255,255,255,.08);padding:4px 12px;border-radius:20px;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.pc-pill:hover,.pc-pill.on{background:rgba(255,255,255,.2);color:#fff;}
+.pc-sidebar{background:var(--card);border-right:1px solid var(--b1);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px);}
+.pc-nav-sec{padding:0 10px;margin-bottom:4px;}
+.pc-nav-label{font-size:10px;font-weight:700;color:var(--hi);letter-spacing:.06em;padding:12px 8px 4px;}
+.pc-nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:9px;border:none;background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--mu);cursor:pointer;text-align:left;transition:all .15s;}
+.pc-nav-btn:hover{background:var(--G2);color:var(--G);}
+.pc-nav-btn.on{background:var(--G2);color:var(--G);font-weight:700;}
+.pc-nav-ico{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.pc-sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--b1);font-size:11px;color:var(--hi);line-height:1.7;}
+.pc-content{padding:22px;overflow-y:auto;height:calc(100vh - 56px);}
+/* pc-page show/hide */
+.pc-page{display:none;}
+.pc-page.on{display:block;}
+.pc-page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;}
+.pc-page-title{font-size:20px;font-weight:700;}
+.pc-page-sub{font-size:12px;color:var(--mu);margin-top:4px;}
+.pc-page-acts{display:flex;gap:8px;flex-shrink:0;}
+.pc-btn{padding:8px 16px;border-radius:9px;border:1.5px solid var(--b1);background:var(--card);font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pc-btn:hover{border-color:var(--G);color:var(--G);}
+.pc-btn.primary{background:var(--G);color:#fff;border-color:var(--G);}
+.pc-card{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);overflow:hidden;}
+.pc-card-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--b1);gap:12px;}
+.pc-card-title{font-size:14px;font-weight:700;}
+.pc-card-body{padding:14px 16px;}
+.pc-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.pc-stat{background:var(--card);border-radius:var(--r);border:1px solid var(--b1);padding:18px;text-align:center;}
+.pc-sn{font-size:28px;font-weight:700;line-height:1;}
+.pc-sl{font-size:12px;color:var(--mu);margin-top:6px;}
+.pc-sup{font-size:11px;color:var(--edu);margin-top:3px;}
+.pc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+.pc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.pc-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.pc-cdow{font-size:11px;color:var(--mu);text-align:center;padding:5px 0;font-weight:500;}
+.pc-cc{min-height:clamp(52px,8vw,80px);border-radius:8px;background:var(--bg);border:1px solid transparent;display:flex;flex-direction:column;padding:clamp(4px,1vw,7px);cursor:pointer;transition:all .12s;overflow:hidden;}
+.pc-cc:hover{border-color:var(--G);background:var(--G2);}
+.pc-cc.tod{border-color:var(--G);background:var(--G2);}
+.pc-cc.sel{border-color:var(--G);background:var(--G2);box-shadow:0 0 0 2px rgba(26,107,60,.2);}
+.pc-cc.emp{opacity:0;pointer-events:none;background:transparent;}
+.pc-cn{font-size:clamp(10px,1.2vw,13px);font-weight:700;color:var(--tx);margin-bottom:3px;}
+.pc-cc.tod .pc-cn{color:var(--G);}
+.pc-ev-chip{font-size:clamp(8px,0.85vw,10px);color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;padding:1px 3px;border-radius:3px;margin-top:1px;}
+.pc-ev-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s;}
+.pc-ev-row:last-child{border-bottom:none;}
+.pc-ev-row:hover{background:var(--bg);}
+.pc-ev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.pc-ev-info{flex:1;min-width:0;}
+.pc-ev-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-ev-meta{font-size:11px;color:var(--mu);margin-top:2px;}
+.pc-rank-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--b1);}
+.pc-rank-item:last-child{border-bottom:none;}
+.pc-rank-n{font-size:18px;font-weight:700;min-width:28px;color:var(--hi);}
+.pc-rank-n.g{color:#C8920A;}.pc-rank-n.s{color:#888;}.pc-rank-n.b{color:#A0622A;}
+.pc-rank-info{flex:1;min-width:0;}
+.pc-rank-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-rank-sub{font-size:11px;color:var(--mu);margin-top:2px;}
+.pc-rank-saves{font-size:14px;font-weight:700;color:#E04070;white-space:nowrap;}
+.pc-table{width:100%;border-collapse:collapse;font-size:13px;}
+.pc-table th{background:var(--bg);padding:10px 14px;text-align:left;font-weight:700;color:var(--mu);border-bottom:1px solid var(--b1);white-space:nowrap;}
+.pc-table td{padding:10px 14px;border-bottom:1px solid var(--b1);vertical-align:middle;}
+.pc-table tr:last-child td{border-bottom:none;}
+.pc-table tr:hover td{background:var(--bg);}
+.td-name{font-weight:700;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.pc-form .full{grid-column:1/-1;}
+.pc-form .form-field{margin-bottom:0;}
+</style>
+</head>
+<body>
+
+<!-- ════ MOBILE APP ════ -->
+<div id="mobile-app">
+  <div class="m-top">
+    <div class="m-top-row">
+      <div class="m-logo" id="logo-btn">해남 문화달력<small>2026년 5월</small><span class="large-badge">큰글씨</span></div>
+      <div class="m-icons">
+        <button class="ibtn" id="btn-search" onclick="openOv('search')" aria-label="검색">🔍</button>
+        <button class="ibtn" id="btn-saved" onclick="openOv('saved')" aria-label="담은것">♡<span class="badge" id="hbadge"></span></button>
+        <button class="ibtn" id="btn-settings" onclick="openOv('settings')" aria-label="설정">⚙️</button>
+      </div>
+    </div>
+    <div class="vtabs">
+      <button class="vt on" id="vt-day" onclick="goToday()">오늘</button>
+      <button class="vt" id="vt-week" onclick="swTab('week','vt-week')">이번 주</button>
+      <button class="vt" id="vt-month" onclick="swTab('month','vt-month')">이번 달</button>
+      <button class="vt" id="vt-hot" onclick="swTab('hot','vt-hot')">인기순</button>
+    </div>
+  </div>
+
+  <div id="m-main">
+    <!-- 오늘 -->
+    <div class="tab on" id="tab-day">
+      <div class="strip-wrap"><div class="strip-hint">날짜를 밀어서 이동</div><div class="dstrip" id="dstrip"></div></div>
+      <div class="sec-hd"><span class="sec-title" id="day-title">5월 17일 행사</span><span class="sec-cnt" id="day-cnt">0건</span></div>
+      <div id="day-content"></div>
+    </div>
+    <!-- 이번 주 -->
+    <div class="tab" id="tab-week">
+      <div class="sec-hd"><span class="sec-title">이번 주</span><span class="sec-cnt" style="background:var(--exhi-bg);color:var(--exhi);" id="week-rng"></span></div>
+      <div class="week-body" id="week-body"></div>
+    </div>
+    <!-- 이번 달 -->
+    <div class="tab" id="tab-month">
+      <div class="month-body">
+        <div class="month-nav"><button class="mnav-btn" onclick="changeMonth(-1)">◀ 전달</button><span class="mnav-title" id="cal-title"></span><button class="mnav-btn" onclick="changeMonth(1)">다음달 ▶</button></div>
+        <div class="calleg"><div class="ll"><div class="ldot" style="background:var(--perf)"></div>공연</div><div class="ll"><div class="ldot" style="background:var(--trad)"></div>전통</div><div class="ll"><div class="ldot" style="background:var(--exhi)"></div>전시</div><div class="ll"><div class="ldot" style="background:var(--edu)"></div>체험</div><div class="ll"><div class="ldot" style="background:var(--fest)"></div>축제</div><div class="ll"><div class="ldot" style="background:var(--evt)"></div>행사</div></div>
+        <div class="calgrid" id="calgrid"></div>
+        <div style="font-size:10px;color:var(--hi);text-align:center;padding:8px 0;">날짜를 누르면 그날 행사를 볼 수 있어요</div>
+      </div>
+    </div>
+    <!-- 인기순 -->
+    <div class="tab" id="tab-hot">
+      <div class="sec-hd"><span class="sec-title">이번 달 인기 행사</span><span class="sec-cnt" style="background:var(--perf-bg);color:var(--perf);">담은 수 기준</span></div>
+      <div class="hotlist" id="hotlist"></div>
+    </div>
+    <!-- 지도 -->
+    <div class="tab" id="tab-map">
+      <div class="sec-hd"><span class="sec-title">지도로 찾기</span><span class="sec-cnt" style="background:var(--exhi-bg);color:var(--exhi);">오늘 이후</span></div>
+      <div class="mf-row"><button class="mfchip on" onclick="setMapF('전체',this)">전체</button><button class="mfchip" onclick="setMapF('공연',this)">공연</button><button class="mfchip" onclick="setMapF('체험',this)">체험</button><button class="mfchip" onclick="setMapF('축제',this)">축제</button><button class="mfchip" onclick="setMapF('전통',this)">전통</button></div>
+      <div class="map-notice">📍 오늘 이후 행사만 표시합니다</div>
+      <div class="map-box"><div class="map-ctr"><div style="font-size:30px">🗺️</div><div style="font-size:12px;font-weight:700;color:var(--G)">해남군 문화행사 지도</div><div style="font-size:10px;color:var(--mu)">실제 서비스 시 카카오맵 연동</div></div>
+        <div class="map-pin" style="left:52%;top:44%" onclick="openModal(12)"><div class="map-pin-ico" style="background:var(--fest)"><i>🎪</i></div><div class="map-pin-lbl">군민광장</div></div>
+        <div class="map-pin" style="left:33%;top:60%" onclick="openModal(10)"><div class="map-pin-ico" style="background:var(--edu)"><i>🍵</i></div><div class="map-pin-lbl">은적사</div></div>
+        <div class="map-pin" style="left:68%;top:38%" onclick="openModal(18)"><div class="map-pin-ico" style="background:var(--perf)"><i>🎭</i></div><div class="map-pin-lbl">문예회관</div></div>
+        <div class="map-pin" style="left:22%;top:43%" onclick="openModal(16)"><div class="map-pin-ico" style="background:var(--evt)"><i>🏯</i></div><div class="map-pin-lbl">대흥사</div></div>
+      </div>
+      <div class="map-evlist" id="map-evlist"></div>
+    </div>
+  </div>
+
+  <div class="m-nav">
+    <button class="bn on" id="bn-cal" onclick="goToday()"><div class="bn-ico">📅</div>달력</button>
+    <button class="bn" id="bn-saved" onclick="openOv('saved')"><div class="bn-ico">♡</div>담은 것</button>
+    <button class="bn" id="bn-map" onclick="showMap()"><div class="bn-ico">📍</div>지도</button>
+  </div>
+
+  <!-- overlays -->
+  <div class="ov" id="ov-saved"><div class="ov-top"><button class="ov-back" onclick="closeOv('saved')">←</button><div class="ov-title">담은 행사</div><span class="ov-sub" id="saved-lbl"></span></div><div class="ov-body" id="saved-body"></div></div>
+  <div class="ov" id="ov-search">
+    <div style="background:var(--card);border-bottom:1px solid var(--b1);padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;">
+      <div style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:8px 12px;border:1.5px solid var(--b1);">
+        <span>🔍</span><input type="search" id="search-inp" style="border:none;background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:14px;color:var(--tx);outline:none;width:100%;" placeholder="행사명, 장소, 카테고리 검색" autocomplete="off" oninput="doSearch(this.value)">
+      </div>
+      <button onclick="closeOv('search')" style="background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--mu);">취소</button>
+    </div>
+    <div id="search-res" style="padding:12px;"><div style="padding:40px 20px;text-align:center;color:var(--mu);font-size:14px;line-height:1.7;">행사명, 장소, 카테고리로 검색해 보세요</div></div>
+  </div>
+  <div class="ov" id="ov-settings">
+    <div class="ov-top"><button class="ov-back" onclick="closeOv('settings')">←</button><div class="ov-title">설정</div></div>
+    <div style="padding:0 12px 20px;">
+      <div class="set-sec-t">표시 설정</div>
+      <div class="set-card"><div class="set-row"><div class="set-ico" style="background:var(--G2)">🔤</div><div class="set-lbl"><div class="set-lbl-main">큰 글씨 모드</div><div class="set-lbl-sub">어르신·시력 약한 분 권장</div></div><button class="toggle" id="large-tog" onclick="event.stopPropagation();toggleLarge(this)"></button></div></div>
+      <div class="set-sec-t">정보</div>
+      <div class="set-card"><div class="set-row"><div class="set-ico" style="background:var(--exhi-bg)">📞</div><div class="set-lbl"><div class="set-lbl-main">문의</div><div class="set-lbl-sub">해남군 문화예술과 061-530-5137</div></div><span class="set-arr">›</span></div><div class="set-row"><div class="set-ico" style="background:var(--fest-bg)">ℹ️</div><div class="set-lbl"><div class="set-lbl-main">버전</div><div class="set-lbl-sub">해남 문화달력 v9.0</div></div></div></div>
+      <div class="set-sec-t">관리자</div>
+      <div class="set-card"><div class="set-row" onclick="openAdm()"><div class="set-ico" style="background:#1A1A18;font-size:14px">⚙️</div><div class="set-lbl"><div class="set-lbl-main">관리자 시스템</div><div class="set-lbl-sub">행사 등록·수정·숨김 (실무자 전용)</div></div><span class="set-arr">›</span></div></div>
+    </div>
+  </div>
+</div><!-- /#mobile-app -->
+
+<!-- ════ ADMIN MOBILE ════ -->
+<div id="adm-mob">
+  <div class="adm-topbar">
+    <div class="adm-logo">해남 문화달력<small>관리자</small></div>
+    <button class="adm-exit" onclick="document.getElementById('adm-mob').classList.remove('open')">← 이용자 화면</button>
+  </div>
+  <div class="adm-body">
+    <div class="adm-tabs">
+      <button class="adm-vt on" onclick="swAdm('dash',this)">대시보드</button>
+      <button class="adm-vt" onclick="swAdm('reg',this)">행사 등록</button>
+      <button class="adm-vt" onclick="swAdm('mgr',this)">관리</button>
+      <button class="adm-vt" onclick="swAdm('hot',this)">🔥 HOT</button>
+      <button class="adm-vt" onclick="swAdm('stats',this)">통계</button>
+    </div>
+
+    <!-- 대시보드 -->
+    <div class="adm-sec on" id="adm-dash">
+      <div class="stat4">
+        <div class="sbox"><div class="sn">21</div><div class="sl">5월 전체 행사</div><div class="sup">▲ 3건 전월비</div></div>
+        <div class="sbox"><div class="sn">1,243</div><div class="sl">이번달 총 담기</div><div class="sup">▲ 18%</div></div>
+        <div class="sbox"><div class="sn">124</div><div class="sl">최고 담기</div></div>
+        <div class="sbox"><div class="sn" id="adm-remain">-</div><div class="sl">오늘 이후 남은</div></div>
+      </div>
+      <div class="adm-sec-t">방문자 현황 (중복 제거)</div>
+      <div class="adm-card" style="padding:12px 14px;">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px;">※ 동일 IP 24시간 재방문 제외 · 봇 필터링 적용</div>
+        <div class="vis-bar-wrap"><span class="vis-label">전체 방문자</span><div class="vis-bar-bg"><div class="vis-bar" style="width:100%"></div></div><span class="vis-num">2,847명</span></div>
+        <div class="vis-bar-wrap"><span class="vis-label">오늘 방문자</span><div class="vis-bar-bg"><div class="vis-bar" style="width:6%;background:#185FA5"></div></div><span class="vis-num">183명</span></div>
+        <div class="vis-bar-wrap"><span class="vis-label">이번달 담기</span><div class="vis-bar-bg"><div class="vis-bar" style="width:44%;background:#E04070"></div></div><span class="vis-num">1,243건</span></div>
+      </div>
+      <div class="adm-sec-t">인기 TOP 5</div>
+      <div class="adm-card" id="adm-top5"></div>
+      <div class="adm-sec-t" style="margin-top:10px;">빠른 메뉴</div>
+      <div class="menu4">
+        <div class="menu-card" onclick="swAdm('reg',document.querySelectorAll('.adm-vt')[1])"><div class="menu-ico">✏️</div><div class="menu-name">행사 등록</div><div class="menu-desc">새 행사 추가</div></div>
+        <div class="menu-card" onclick="swAdm('mgr',document.querySelectorAll('.adm-vt')[2])"><div class="menu-ico">📋</div><div class="menu-name">행사 관리</div><div class="menu-desc">수정·숨김·취소</div></div>
+        <div class="menu-card" onclick="swAdm('hot',document.querySelectorAll('.adm-vt')[3])" style="border-color:#F5A623"><div class="menu-ico">🔥</div><div class="menu-name" style="color:#8A5200">HOT 추천</div><div class="menu-desc">인기순 상단 노출</div></div>
+        <div class="menu-card" onclick="swAdm('stats',document.querySelectorAll('.adm-vt')[4])"><div class="menu-ico">📊</div><div class="menu-name">통계</div><div class="menu-desc">담기·방문자 현황</div></div>
+      </div>
+    </div>
+
+    <!-- 행사 등록 -->
+    <div class="adm-sec" id="adm-reg">
+      <div class="up-tabs"><button class="utab on" onclick="swUp('single',this)">개별 입력</button><button class="utab" onclick="swUp('poster',this)">포스터 OCR</button><button class="utab" onclick="swUp('table',this)">표 이미지</button><button class="utab" onclick="swUp('excel',this)">엑셀</button></div>
+      <div class="up-sec on" id="up-single">
+        <div class="form-field"><div class="form-label">카테고리 <span class="req">필수</span></div><div class="cat-chips" id="cat-chips-mob"><button class="cchip on" style="background:var(--perf-bg);border-color:var(--perf);color:var(--perf)" onclick="selCat(this,'cat-chips-mob')">공연<span class="chip-ck"> ✓</span></button><button class="cchip" style="border-color:var(--trad);color:var(--trad)" onclick="selCat(this,'cat-chips-mob')">전통</button><button class="cchip" style="border-color:var(--exhi);color:var(--exhi)" onclick="selCat(this,'cat-chips-mob')">전시</button><button class="cchip" style="border-color:var(--edu);color:var(--edu)" onclick="selCat(this,'cat-chips-mob')">체험</button><button class="cchip" style="border-color:var(--fest);color:var(--fest)" onclick="selCat(this,'cat-chips-mob')">축제</button><button class="cchip" style="border-color:var(--evt);color:var(--evt)" onclick="selCat(this,'cat-chips-mob')">행사</button></div></div>
+        <div class="form-field"><div class="form-label">행사명 <span class="req">필수</span></div><input type="text" class="form-input" placeholder="예) 해남군립국악단 정기공연"></div>
+        <div class="form-row"><div class="form-field"><div class="form-label">시작일 <span class="req">필수</span></div><input type="date" class="form-input" value="2026-05-20"></div><div class="form-field"><div class="form-label">종료일</div><input type="date" class="form-input"><div class="form-hint">단일행사 비워두기</div></div></div>
+        <div class="form-row"><div class="form-field"><div class="form-label">시작 시간 <span class="req">필수</span></div><input type="time" class="form-input" value="14:00"></div><div class="form-field"><div class="form-label">종료 시간</div><input type="time" class="form-input"></div></div>
+        <div class="form-field"><div class="form-label">장소 <span class="req">필수</span></div><input type="text" class="form-input" placeholder="해남문화예술회관 대공연장"></div>
+        <div class="form-field"><div class="form-label">대상 <span class="req">필수</span></div><div class="cat-chips" style="margin-bottom:6px"><button class="target-chip on" onclick="this.classList.toggle('on')">누구나</button><button class="target-chip" onclick="this.classList.toggle('on')">학생</button><button class="target-chip" onclick="this.classList.toggle('on')">어린이</button><button class="target-chip" onclick="this.classList.toggle('on')">시니어</button></div><input type="text" class="form-input" placeholder="추가 조건 (선착순 20명 등)"></div>
+        <div class="form-row"><div class="form-field"><div class="form-label">가격 <span class="req">필수</span></div><select class="form-input"><option>무료</option><option>유료</option><option>조건부</option></select></div><div class="form-field"><div class="form-label">문의처 <span class="req">필수</span></div><input type="tel" class="form-input" placeholder="530-5137"><div class="form-hint">061- 자동</div></div></div>
+        <div class="form-field"><div class="form-label">행사 내용 <span class="req">필수</span></div><textarea class="form-input" rows="3" placeholder="행사 내용을 2~3줄로 요약"></textarea></div>
+        <div class="form-field"><div class="form-label">반복 설정</div><select class="form-input"><option>반복 없음</option><option>매주 반복</option><option>매월 반복</option></select><div class="form-hint">차 교육 등 반복 행사 자동 등록</div></div>
+        <div class="form-actions"><button class="btn-draft" onclick="showToast('임시저장 완료!')">임시저장</button><button class="btn-pub" onclick="showToast('✅ 달력에 등록되었습니다!')">달력에 등록</button></div>
+      </div>
+      <div class="up-sec" id="up-poster"><div style="background:var(--edu-bg);border-radius:var(--rsm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--edu)">포스터 이미지 1장 → 행사명·날짜·장소·가격 자동 추출</div><div class="drop-zone" onclick="simOcr('poster')"><div class="drop-ico">📸</div><div class="drop-label">포스터 이미지 업로드</div><div class="drop-sub">JPG · PNG · PDF</div></div><div class="parse-bar" id="pb-poster">🔍 이미지 분석 중...</div><div class="preview-tbl" id="pv-poster"><table><tr><th>추출 항목</th><th>인식 결과</th></tr><tr><td>행사명</td><td>해남군립국악단 정기공연</td></tr><tr><td>날짜</td><td>2026.05.28</td></tr><tr><td>시간</td><td>오후 7:00</td></tr><tr><td>장소</td><td>해남문화예술회관</td></tr><tr><td>가격</td><td>무료</td></tr></table></div><div class="form-area" id="fa-poster"><div class="form-hint" style="color:var(--G);font-weight:700;margin-bottom:10px">✓ 자동 추출 완료</div><div class="form-field"><div class="form-label">행사명</div><input type="text" class="form-input" value="해남군립국악단 정기공연"></div><div class="form-field"><div class="form-label">날짜·시간</div><input type="text" class="form-input" value="2026-05-28 오후 7:00"></div><div class="form-actions"><button class="btn-draft" onclick="showToast('임시저장!')">임시저장</button><button class="btn-pub" onclick="showToast('✅ 달력에 등록!')">달력에 등록</button></div></div></div>
+      <div class="up-sec" id="up-table"><div style="background:var(--edu-bg);border-radius:var(--rsm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--edu)">💡 문화달력 세부내용 표 이미지 → 여러 행사 한 번에 등록</div><div class="drop-zone" onclick="simOcr('table')"><div class="drop-ico">📋</div><div class="drop-label">세부내용 표 이미지 업로드</div><div class="drop-sub">JPG · PNG</div></div><div class="parse-bar" id="pb-table">📋 표 구조 인식 중...</div><div class="preview-tbl" id="pv-table"><table><tr><th>날짜</th><th>행사명</th><th>장소</th><th>가격</th></tr><tr><td>5.13</td><td>잽이들의 노래</td><td>문예회관</td><td>5,000원</td></tr><tr><td>5.16</td><td>연등문화축제</td><td>군민광장</td><td>무료</td></tr><tr><td colspan="4" style="color:var(--hi);text-align:center">... 총 22건</td></tr></table></div><div class="form-area" id="fa-table"><div class="form-hint" style="color:var(--G);font-weight:700;margin-bottom:8px">✓ 22건 인식 완료</div><div class="form-actions"><button class="btn-draft" onclick="showToast('검토 저장!')">검토 후 저장</button><button class="btn-pub" onclick="showToast('✅ 22건 일괄 등록!')">22건 일괄 등록</button></div></div></div>
+      <div class="up-sec" id="up-excel"><div style="background:var(--exhi-bg);border-radius:var(--rsm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--exhi)">💡 엑셀(xlsx/xls/csv) 파일로 전체 행사를 한 번에 등록</div><div class="drop-zone" onclick="simOcr('excel')"><div class="drop-ico">📊</div><div class="drop-label">엑셀 파일 업로드</div><div class="drop-sub">xlsx · xls · csv</div></div><div class="parse-bar" id="pb-excel">📊 엑셀 파싱 중...</div><div class="preview-tbl" id="pv-excel"><table><tr><th>A→날짜</th><th>B→행사명</th><th>C→장소</th><th>D→가격</th></tr><tr><td>5.2</td><td>해남공룡대축제</td><td>공룡박물관</td><td>무료</td></tr><tr><td colspan="4" style="color:var(--hi);text-align:center">... 총 29행</td></tr></table></div><div class="form-area" id="fa-excel"><div class="form-actions"><button class="btn-draft" onclick="showToast('매핑 저장!')">매핑 저장</button><button class="btn-pub" onclick="showToast('✅ 29건 일괄 등록!')">29건 일괄 등록</button></div></div></div>
+    </div>
+
+    <!-- 관리 -->
+    <div class="adm-sec" id="adm-mgr">
+      <div style="display:flex;gap:6px;margin-bottom:8px"><input type="text" class="form-input" placeholder="행사명 검색" style="flex:1;padding:8px 12px;font-size:12px" oninput="admQ=this.value;renderAdmMgr()"><select class="form-input" style="width:75px;padding:8px;font-size:11px" onchange="admSF=this.value;renderAdmMgr()"><option value="">전체</option><option value="pub">공개</option><option value="hidden">숨김</option><option value="cancelled">취소</option></select></div>
+      <div style="background:#FFF7E6;border-radius:7px;padding:6px 10px;margin-bottom:8px;font-size:10px;color:#8A5200">🟡 숨김 = 달력 비표시, 복원 가능 | 🔴 취소 = "취소됨" 표시 후 유지</div>
+      <div class="adm-card" id="adm-mgr-list"></div>
+    </div>
+
+    <!-- HOT 추천 -->
+    <div class="adm-sec" id="adm-hot">
+      <div style="background:#FFF7E6;border:1px solid #F5D07A;border-radius:10px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:#8A5200;margin-bottom:6px">🔥 HOT 추천 지정 가이드</div>
+        <div style="font-size:11px;color:#8A5200;line-height:1.7">HOT 지정 → <b>인기순 최상단</b> + <b>이번달 달력 ★ 표시</b><br>기준: 담기 수 많은 행사 = 이용자 관심 높음<br>권장: 최대 3개</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 5px">
+        <span class="adm-sec-t" style="padding:0">현재 HOT 지정</span>
+        <span id="hot-cnt-lbl" style="font-size:12px"></span>
+      </div>
+      <div class="adm-card" id="hot-featured-list"></div>
+      <div style="margin-top:14px;margin-bottom:7px">
+        <div class="adm-sec-t" style="padding:0 0 6px">전체 행사 — 담기 수 기준</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:8px;padding:5px 8px;background:var(--bg);border-radius:6px">담기 수 = 이용자 관심도. 상위 행사가 HOT 효과 극대화</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px" id="hot-filter-row">
+          <button class="mfchip on" onclick="setHotFilter('all',this)">전체</button><button class="mfchip" onclick="setHotFilter('공연',this)">공연</button><button class="mfchip" onclick="setHotFilter('전통',this)">전통</button><button class="mfchip" onclick="setHotFilter('체험',this)">체험</button><button class="mfchip" onclick="setHotFilter('축제',this)">축제</button>
+        </div>
+      </div>
+      <div class="adm-card" id="hot-all-list"></div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="adm-sec" id="adm-stats">
+      <div class="adm-sec-t">📊 방문자 현황 (중복 제거)</div>
+      <div style="background:var(--G2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--G)">동일 IP 24시간 재방문 제외 · 봇 트래픽 필터링 적용</div>
+      <div class="stat4">
+        <div class="sbox"><div class="sn">2,847</div><div class="sl">전체 방문자 (고유)</div></div>
+        <div class="sbox"><div class="sn">183</div><div class="sl">오늘 방문자</div></div>
+        <div class="sbox"><div class="sn">1,243</div><div class="sl">이번달 담기</div></div>
+        <div class="sbox"><div class="sn">8.4분</div><div class="sl">평균 체류</div></div>
+      </div>
+      <div class="adm-sec-t">최근 7일 방문자 추이</div>
+      <div class="adm-card" style="padding:12px 14px" id="visit-chart"></div>
+      <div class="adm-sec-t" style="margin-top:10px">인기 행사 TOP 5</div>
+      <div class="adm-card" id="stats-top5"></div>
+      <div class="adm-sec-t" style="margin-top:10px">카테고리별 담기</div>
+      <div class="adm-card" style="padding:12px 14px" id="stats-cat"></div>
+    </div>
+  </div>
+</div><!-- /#adm-mob -->
+
+<!-- ════ MODAL (공통) ════ -->
+<div id="backdrop" onclick="if(event.target===this)closeMod()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeMod()">✕</button>
+    <div class="modal-handle"></div>
+    <div class="m-alert" id="m-alert"></div>
+    <div class="m-cat" id="m-cat"></div>
+    <div class="m-title" id="m-title"></div>
+    <div id="m-rows"></div>
+    <div class="m-desc" id="m-desc"></div>
+    <div class="m-saves" id="m-saves"></div>
+    <div class="m-actions"><button class="m-call" id="m-call">📞 문의</button><button class="m-save" id="m-savebtn" onclick="modalSave()">♡ 담기</button></div>
+  </div>
+</div>
+
+<!-- ════ PC APP ════ -->
+<div id="pc-app">
+  <!-- PC 상단바 (grid-column:1/-1) -->
+  <div class="pc-bar">
+    <div class="pc-bar-logo">해남 문화달력<small>관리자 시스템</small></div>
+    <div class="pc-bar-right">
+      <span style="font-size:11px;color:#8A8A84">📅 2026년 5월 17일 · 오늘 이후 행사 <b id="pc-remain" style="color:#7CBA8C">-</b>건</span>
+      <button class="pc-pill on" id="pp-dashboard" onclick="pcGo('dashboard')">🏠 대시보드</button>
+      <button class="pc-pill" id="pp-calendar" onclick="pcGo('calendar')">📅 달력</button>
+      <button class="pc-pill" id="pp-events" onclick="pcGo('events')">📋 행사 관리</button>
+      <button class="pc-pill" id="pp-register" onclick="pcGo('register')">✏️ 등록</button>
+      <button class="pc-pill" id="pp-stats" onclick="pcGo('stats')">📊 통계</button>
+    </div>
+  </div>
+
+  <!-- PC 사이드바 -->
+  <div class="pc-sidebar">
+    <div class="pc-nav-sec">
+      <div class="pc-nav-label">대시보드</div>
+      <button class="pc-nav-btn on" id="pcn-dashboard" onclick="pcGo('dashboard')"><span class="pc-nav-ico">🏠</span>홈 대시보드</button>
+      <button class="pc-nav-btn" id="pcn-calendar" onclick="pcGo('calendar')"><span class="pc-nav-ico">📅</span>달력 뷰</button>
+    </div>
+    <div class="pc-nav-sec">
+      <div class="pc-nav-label">행사 관리</div>
+      <button class="pc-nav-btn" id="pcn-register" onclick="pcGo('register')"><span class="pc-nav-ico">✏️</span>행사 등록</button>
+      <button class="pc-nav-btn" id="pcn-events" onclick="pcGo('events')"><span class="pc-nav-ico">📋</span>행사 목록·관리</button>
+      <button class="pc-nav-btn" id="pcn-hidden" onclick="pcGo('hidden')"><span class="pc-nav-ico">🔒</span>숨김·취소 관리</button>
+    </div>
+    <div class="pc-nav-sec">
+      <div class="pc-nav-label">분석</div>
+      <button class="pc-nav-btn" id="pcn-stats" onclick="pcGo('stats')"><span class="pc-nav-ico">📊</span>통계·방문자</button>
+    </div>
+    <div class="pc-sidebar-footer">해남군 문화예술과<br>☎ 061-530-5137<br>v9.0 · 2026년 5월</div>
+  </div>
+
+  <!-- PC 콘텐츠 -->
+  <div class="pc-content">
+    <!-- 대시보드 -->
+    <div class="pc-page on" id="pc-dashboard">
+      <div class="pc-page-hd"><div><div class="pc-page-title">👋 안녕하세요, 해남군 담당자님</div><div class="pc-page-sub">2026년 5월 17일 (일) · 오늘 기준 대시보드</div></div><div class="pc-page-acts"><button class="pc-btn" onclick="pcGo('events')">행사 목록</button><button class="pc-btn primary" onclick="pcGo('register')">+ 행사 등록</button></div></div>
+      <div class="pc-stat-row">
+        <div class="pc-stat"><div class="pc-sn">21</div><div class="pc-sl">5월 전체 행사</div><div class="pc-sup">▲ 3건 전월비</div></div>
+        <div class="pc-stat"><div class="pc-sn" id="pc-remain2">-</div><div class="pc-sl">오늘 이후 남은 행사</div></div>
+        <div class="pc-stat"><div class="pc-sn">1,243</div><div class="pc-sl">이번달 총 담기</div><div class="pc-sup">▲ 18% 증가</div></div>
+        <div class="pc-stat"><div class="pc-sn">124</div><div class="pc-sl">최고 담기 (연등축제)</div></div>
+      </div>
+      <div class="pc-grid2">
+        <div class="pc-card"><div class="pc-card-hd"><span class="pc-card-title">🔥 인기 TOP 5</span><button class="pc-btn" style="font-size:11px;padding:5px 12px" onclick="pcGo('stats')">전체 보기</button></div><div id="pc-top5"></div></div>
+        <div class="pc-card"><div class="pc-card-hd"><span class="pc-card-title">📅 오늘(5.17) 행사</span><span id="pc-today-cnt" style="font-size:12px;color:var(--mu)"></span></div><div id="pc-today-list"></div></div>
+      </div>
+      <div class="pc-grid3">
+        <div class="pc-card" style="cursor:pointer" onclick="pcGo('register')"><div class="pc-card-body" style="text-align:center;padding:28px"><div style="font-size:32px;margin-bottom:10px">✏️</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">행사 등록</div><div style="font-size:12px;color:var(--mu)">포스터·표·엑셀로 빠르게</div></div></div>
+        <div class="pc-card" style="cursor:pointer" onclick="pcGo('events')"><div class="pc-card-body" style="text-align:center;padding:28px"><div style="font-size:32px;margin-bottom:10px">📋</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">행사 관리</div><div style="font-size:12px;color:var(--mu)">수정·숨김·취소·복원</div></div></div>
+        <div class="pc-card" style="cursor:pointer" onclick="pcGo('stats')"><div class="pc-card-body" style="text-align:center;padding:28px"><div style="font-size:32px;margin-bottom:10px">📊</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">통계·방문자</div><div style="font-size:12px;color:var(--mu)">담기·방문자 현황</div></div></div>
+      </div>
+    </div>
+
+    <!-- 달력 뷰 -->
+    <div class="pc-page" id="pc-calendar">
+      <div class="pc-page-hd"><div><div class="pc-page-title">📅 달력 뷰</div><div class="pc-page-sub" id="pc-cal-sub">2026년 5월</div></div><div class="pc-page-acts"><button class="pc-btn" onclick="pcChangeMonth(-1)">◀ 전달</button><button class="pc-btn" onclick="pcChangeMonth(1)">다음달 ▶</button><button class="pc-btn primary" onclick="pcGo('register')">+ 행사 등록</button></div></div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:18px">
+        <div class="pc-card"><div class="pc-card-hd"><span class="pc-card-title" id="pc-cal-title">2026년 5월</span><div class="calleg" style="margin:0"><div class="ll"><div class="ldot" style="background:var(--perf)"></div>공연</div><div class="ll"><div class="ldot" style="background:var(--trad)"></div>전통</div><div class="ll"><div class="ldot" style="background:var(--edu)"></div>체험</div><div class="ll"><div class="ldot" style="background:var(--fest)"></div>축제</div></div></div><div class="pc-card-body"><div class="pc-cal-grid" id="pc-calgrid"></div></div></div>
+        <div class="pc-card"><div class="pc-card-hd"><span class="pc-card-title" id="pc-day-title">날짜를 선택하세요</span></div><div id="pc-day-list" style="max-height:calc(100vh - 290px);overflow-y:auto"></div></div>
+      </div>
+    </div>
+
+    <!-- 행사 등록 (PC) -->
+    <div class="pc-page" id="pc-register">
+      <div class="pc-page-hd"><div><div class="pc-page-title">✏️ 행사 등록</div><div class="pc-page-sub">포스터·표 이미지·엑셀 또는 직접 입력</div></div></div>
+      <div class="up-tabs" style="margin-bottom:20px"><button class="utab on" onclick="swUp2('pc-single',this)">개별 직접 입력</button><button class="utab" onclick="swUp2('pc-poster',this)">포스터 이미지 OCR</button><button class="utab" onclick="swUp2('pc-table',this)">표 이미지 (세부내용)</button><button class="utab" onclick="swUp2('pc-excel',this)">엑셀 일괄 업로드</button></div>
+      <div class="up-sec on" id="up-pc-single"><div class="pc-card"><div class="pc-card-body"><div class="pc-form">
+        <div class="form-field full"><div class="form-label">카테고리 <span class="req">필수</span></div><div class="cat-chips" id="cat-chips-pc"><button class="cchip on" style="background:var(--perf-bg);border-color:var(--perf);color:var(--perf)" onclick="selCat(this,'cat-chips-pc')">공연<span class="chip-ck"> ✓</span></button><button class="cchip" style="border-color:var(--trad);color:var(--trad)" onclick="selCat(this,'cat-chips-pc')">전통</button><button class="cchip" style="border-color:var(--exhi);color:var(--exhi)" onclick="selCat(this,'cat-chips-pc')">전시</button><button class="cchip" style="border-color:var(--edu);color:var(--edu)" onclick="selCat(this,'cat-chips-pc')">체험</button><button class="cchip" style="border-color:var(--fest);color:var(--fest)" onclick="selCat(this,'cat-chips-pc')">축제</button><button class="cchip" style="border-color:var(--evt);color:var(--evt)" onclick="selCat(this,'cat-chips-pc')">행사</button></div></div>
+        <div class="form-field full"><div class="form-label">행사명 <span class="req">필수</span></div><input type="text" class="form-input" placeholder="예) 해남군립국악단 정기공연"></div>
+        <div class="form-field"><div class="form-label">시작일 <span class="req">필수</span></div><input type="date" class="form-input" value="2026-05-20"></div>
+        <div class="form-field"><div class="form-label">종료일</div><input type="date" class="form-input"><div class="form-hint">단일행사 비워두기</div></div>
+        <div class="form-field"><div class="form-label">시작 시간 <span class="req">필수</span></div><input type="time" class="form-input" value="14:00"></div>
+        <div class="form-field"><div class="form-label">종료 시간</div><input type="time" class="form-input"></div>
+        <div class="form-field full"><div class="form-label">장소 <span class="req">필수</span></div><input type="text" class="form-input" placeholder="해남문화예술회관 대공연장"></div>
+        <div class="form-field full"><div class="form-label">주소</div><input type="text" class="form-input" placeholder="전남 해남군 …"><div class="form-hint">지도 핀 자동 표시</div></div>
+        <div class="form-field full"><div class="form-label">대상 <span class="req">필수</span></div><div class="cat-chips"><button class="target-chip on" onclick="this.classList.toggle('on')">누구나</button><button class="target-chip" onclick="this.classList.toggle('on')">학생</button><button class="target-chip" onclick="this.classList.toggle('on')">어린이</button><button class="target-chip" onclick="this.classList.toggle('on')">시니어</button><button class="target-chip" onclick="this.classList.toggle('on')">사전접수</button></div></div>
+        <div class="form-field"><div class="form-label">가격 <span class="req">필수</span></div><select class="form-input"><option>무료</option><option>유료</option><option>조건부</option></select></div>
+        <div class="form-field"><div class="form-label">문의처 <span class="req">필수</span></div><input type="tel" class="form-input" placeholder="530-5137"><div class="form-hint">061- 자동 입력</div></div>
+        <div class="form-field full"><div class="form-label">행사 내용 <span class="req">필수</span></div><textarea class="form-input" rows="3" placeholder="행사 내용을 2~3줄로 요약해 주세요"></textarea></div>
+        <div class="form-field full"><div class="form-actions"><button class="btn-draft" onclick="showToast('임시저장 완료!')">임시저장</button><button class="btn-pub" onclick="showToast('✅ 달력에 등록되었습니다!')">달력에 등록</button></div></div>
+      </div></div></div></div>
+      <div class="up-sec" id="up-pc-poster"><div class="pc-card"><div class="pc-card-body"><div style="background:var(--edu-bg);border-radius:var(--rsm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--edu)">포스터 이미지 1장 → 행사명·날짜·장소·가격 자동 추출</div><div class="drop-zone" style="height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center" onclick="simOcr('pc-poster')"><div class="drop-ico">📸</div><div class="drop-label">포스터 이미지 업로드</div><div class="drop-sub">JPG · PNG · PDF</div></div><div class="parse-bar" id="pb-pc-poster">🔍 분석 중...</div><div class="preview-tbl" id="pv-pc-poster"><table><tr><th>추출 항목</th><th>인식 결과</th></tr><tr><td>행사명</td><td>해남군립국악단 정기공연</td></tr><tr><td>날짜</td><td>2026.05.28</td></tr><tr><td>가격</td><td>무료</td></tr></table></div><div class="form-area" id="fa-pc-poster"><div class="form-hint" style="color:var(--G);font-weight:700;margin-bottom:10px">✓ 자동 추출 완료</div><div class="form-field"><div class="form-label">행사명</div><input type="text" class="form-input" value="해남군립국악단 정기공연"></div><div class="form-actions"><button class="btn-draft" onclick="showToast('임시저장!')">임시저장</button><button class="btn-pub" onclick="showToast('✅ 달력에 등록!')">달력에 등록</button></div></div></div></div></div>
+      <div class="up-sec" id="up-pc-table"><div class="pc-card"><div class="pc-card-body"><div style="background:var(--edu-bg);border-radius:var(--rsm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--edu)">💡 공무원이 작성한 문화달력 세부내용 표 이미지 → 여러 행사 한 번에 등록</div><div class="drop-zone" style="height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center" onclick="simOcr('pc-table')"><div class="drop-ico">📋</div><div class="drop-label">세부내용 표 이미지 업로드</div><div class="drop-sub">JPG · PNG</div></div><div class="parse-bar" id="pb-pc-table">📋 표 구조 인식 중...</div><div class="preview-tbl" id="pv-pc-table"><table><tr><th>날짜</th><th>행사명</th><th>장소</th><th>가격</th></tr><tr><td>5.13</td><td>잽이들의 노래</td><td>문예회관</td><td>5,000원</td></tr><tr><td colspan="4" style="color:var(--hi);text-align:center">... 총 22건</td></tr></table></div><div class="form-area" id="fa-pc-table"><div class="form-hint" style="color:var(--G);font-weight:700;margin-bottom:8px">✓ 22건 인식 완료</div><div class="form-actions"><button class="btn-draft" onclick="showToast('검토 저장!')">검토 후 저장</button><button class="btn-pub" onclick="showToast('✅ 22건 일괄 등록!')">22건 일괄 등록</button></div></div></div></div></div>
+      <div class="up-sec" id="up-pc-excel"><div class="pc-card"><div class="pc-card-body"><div style="background:var(--exhi-bg);border-radius:var(--rsm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--exhi)">💡 엑셀(xlsx/xls/csv) 파일로 전체 행사를 한 번에 등록할 수 있어요</div><div class="drop-zone" style="height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center" onclick="simOcr('pc-excel')"><div class="drop-ico">📊</div><div class="drop-label">엑셀 파일 업로드</div><div class="drop-sub">xlsx · xls · csv</div></div><div class="parse-bar" id="pb-pc-excel">📊 파싱 중...</div><div class="preview-tbl" id="pv-pc-excel"><table><tr><th>A→날짜</th><th>B→행사명</th><th>C→장소</th><th>D→가격</th></tr><tr><td>5.2</td><td>해남공룡대축제</td><td>공룡박물관</td><td>무료</td></tr><tr><td colspan="4" style="color:var(--hi);text-align:center">... 총 29행</td></tr></table></div><div class="form-area" id="fa-pc-excel"><div class="form-actions"><button class="btn-draft" onclick="showToast('매핑 저장!')">매핑 저장</button><button class="btn-pub" onclick="showToast('✅ 29건 일괄 등록!')">29건 일괄 등록</button></div></div></div></div></div>
+    </div>
+
+    <!-- 행사 목록·관리 -->
+    <div class="pc-page" id="pc-events">
+      <div class="pc-page-hd"><div><div class="pc-page-title">📋 행사 목록 · 관리</div><div class="pc-page-sub">전체 행사 수정·숨김·취소·복원</div></div><div class="pc-page-acts"><button class="pc-btn primary" onclick="pcGo('register')">+ 행사 등록</button></div></div>
+      <div class="pc-card"><div class="pc-card-hd"><div style="display:flex;gap:8px;flex:1"><input type="text" class="form-input" placeholder="행사명 검색" style="max-width:240px;padding:7px 12px;font-size:13px" oninput="admQ=this.value;renderAdmMgr();renderPcMgr()"><select class="form-input" style="width:90px;padding:7px;font-size:12px" onchange="admSF=this.value;renderAdmMgr();renderPcMgr()"><option value="">전체</option><option value="pub">공개</option><option value="hidden">숨김</option><option value="cancelled">취소</option></select></div></div>
+      <div style="overflow-x:auto"><table class="pc-table"><thead><tr><th>상태</th><th>날짜</th><th>카테고리</th><th>행사명</th><th>장소</th><th>담기</th><th>관리</th></tr></thead><tbody id="pc-mgr-body"></tbody></table></div></div>
+    </div>
+
+    <!-- 숨김·취소 -->
+    <div class="pc-page" id="pc-hidden">
+      <div class="pc-page-hd"><div><div class="pc-page-title">🔒 숨김·취소 관리</div><div class="pc-page-sub">복원 또는 영구 삭제</div></div></div>
+      <div class="pc-card"><div id="pc-hidden-body" style="padding:14px 16px"></div></div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="pc-page" id="pc-stats">
+      <div class="pc-page-hd"><div><div class="pc-page-title">📊 통계 · 방문자</div><div class="pc-page-sub">담기 수, 조회 수, 방문자 (중복 제거)</div></div></div>
+      <div class="pc-stat-row">
+        <div class="pc-stat"><div class="pc-sn">2,847</div><div class="pc-sl">전체 방문자 (고유 IP)</div><div class="pc-sup">이번달 누적</div></div>
+        <div class="pc-stat"><div class="pc-sn">183</div><div class="pc-sl">오늘 방문자 (고유)</div><div class="pc-sup">동일 IP 제거</div></div>
+        <div class="pc-stat"><div class="pc-sn">1,243</div><div class="pc-sl">이번달 총 담기</div></div>
+        <div class="pc-stat"><div class="pc-sn">8.4분</div><div class="pc-sl">평균 체류 시간</div></div>
+      </div>
+      <div class="pc-grid2">
+        <div class="pc-card"><div class="pc-card-hd"><span class="pc-card-title">🔥 인기 행사 TOP 10</span></div><div id="pc-stats-hot"></div></div>
+        <div class="pc-card">
+          <div class="pc-card-hd"><span class="pc-card-title">📈 최근 7일 방문자 추이</span></div>
+          <div style="padding:16px" id="pc-visit-chart"></div>
+          <div class="pc-card-hd" style="border-top:1px solid var(--b1)"><span class="pc-card-title">카테고리별 담기</span></div>
+          <div id="pc-stats-cat" style="padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.pc-content -->
+</div><!-- /#pc-app -->
+
+<!-- TOAST -->
+<div id="toast-wrap"><div id="toast"></div></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+var _now = new Date(2026,4,17); // 데모고정. 실서비스: new Date()
+var TODAY = _now.getDate();
+var TODAY_M = _now.getMonth();  // 0-indexed
+var TODAY_Y = _now.getFullYear();
+var currentDay = TODAY;
+var selCalDay = null;
+var calM = {y:TODAY_Y, m:TODAY_M};
+var pcCalM = {y:TODAY_Y, m:TODAY_M};
+var mapF = '전체';
+var saved = {};
+var curModal = null;
+var admQ = '', admSF = '';
+var hotFilter = 'all';
+var editEv = null;
+var _isPC = false; // applyLayout()에서 갱신
+
+var DOW = ['일','월','화','수','목','금','토'];
+function getDow(d){ return (d - 1 + 5) % 7; } // 5월1일=금(5)
+function dIM(y,m){ return [31,28,31,30,31,30,31,31,30,31,30,31][m]; }
+function calOff(y,m){ // 각 월 1일 요일 (일=0 기준)
+  var offs = {0:4,1:0,2:0,3:3,4:5,5:1,6:3,7:6,8:2,9:4,10:0,11:2};
+  return offs[m] !== undefined ? offs[m] : new Date(y,m,1).getDay();
+}
+
+var events = [
+  {id:1,date:2,end:5,cat:'fest',catL:'축제',title:'해남공룡대축제',time:'11:00~',place:'해남공룡박물관 일원',who:'누구나',price:'무료',contact:'530-5158',desc:'어린이날 기념식, 공룡가족음악회, 캐릭터 싱어롱쇼, 공룡드론쇼, 어린이 공연, 공룡발자국탐험대',saves:76,status:'pub'},
+  {id:2,date:2,cat:'trad',catL:'전통',title:'해남민속예술제',time:'14:00~',place:'해남군민광장',who:'누구나',price:'무료',contact:'530-5137',desc:'해남군 연합행사, 우수영 들소리 등 공연, 전통 연만들기 체험',saves:38,status:'pub'},
+  {id:3,date:6,cat:'perf',catL:'공연',title:'우리, 오늘은 문화로 놀아요',time:'16:00~18:00',place:'해남공원',who:'누구나',price:'무료',contact:'535-6285',desc:'해금·피리 전통 공연, 캐리커처, 슈링클스 키링, 야외 바둑 아트 체험',saves:51,status:'pub'},
+  {id:4,date:8,cat:'fest',catL:'축제',title:'2026 연호보리축제 in 해남 황산',time:'10:00~',place:'황산면 원금길 162-14',who:'누구나',price:'무료',contact:'530-5158',desc:'연호마을을 보리밭에서 즐기는 소풍. 체험 및 먹거리 행사',saves:33,status:'pub'},
+  {id:5,date:9,cat:'evt',catL:'행사',title:'제7회 전국 녹우당 어린이 그림그리기',time:'10:30~13:00',place:'고산유적지 일원',who:'학생 (사전접수 필수)',price:'무료',contact:'530-5128',desc:'녹우당 전경, 자화상, 오우가 소재 자유화 중 1개 선택',saves:41,status:'pub'},
+  {id:6,date:10,cat:'fest',catL:'축제',title:'옥천면 죽촌마을 작약꽃 축제',time:'11:00~14:00',place:'옥천면 팔산리 12번지',who:'누구나',price:'무료',contact:'531-3314',desc:'작약꽃 전시 및 공연',saves:27,status:'pub'},
+  {id:7,date:13,cat:'trad',catL:'전통',title:'잽이들의 노래',time:'14:30~',place:'해남문화예술회관 대공연장',who:'5세 이상 · 5,000원',price:'5,000원',contact:'530-5137',desc:'국악 공연(전통 연희극). 풍물굿패 해원. 티켓예매 010-6322-7198',saves:89,status:'pub',lat:true,featured:true},
+  {id:8,date:13,end:31,cat:'exhi',catL:'전시',title:'해남시네마 영화관람료 할인',time:'상시',place:'해남시네마',who:'누구나 / 1인 2매',price:'1,000원 (3D 3,000원)',contact:'533-7717',desc:'현장예매·온라인예매 모두 가능. 단체대관 시에도 적용. 예산 소진 시 조기 종료',saves:45,status:'pub'},
+  {id:9,date:14,cat:'edu',catL:'체험',title:'해남의 차 교육 (목)',time:'09:00~13:00',place:'은적사 일원',who:'학생 · 무료',price:'무료',contact:'533-5345',desc:'국가유산체험(보물과제다, 찻잎채취, 차음식), 천연기념물 만나기, ESG체험',saves:47,status:'pub',lat:true},
+  {id:10,date:15,cat:'edu',catL:'체험',title:'해남의 차 교육 (금 오후)',time:'14:00~18:00',place:'은적사 일원',who:'누구나 · 무료',price:'무료',contact:'533-5345',desc:'국가유산체험 및 ESG 생태체험',saves:31,status:'pub',lat:true},
+  {id:11,date:15,cat:'perf',catL:'공연',title:'특별공연 (취소)',time:'15:00~',place:'해남공원',who:'누구나',price:'무료',contact:'530-5137',desc:'강사 사정으로 취소되었습니다. 불편을 드려 죄송합니다.',saves:8,status:'cancelled'},
+  {id:12,date:16,cat:'fest',catL:'축제',title:'연등문화축제',time:'17:00~',place:'해남군민광장',who:'누구나',price:'체험비 무료',contact:'530-5502',desc:'공연 및 체험행사. 대흥사 주관. 연등 만들기 체험 및 다양한 공연',saves:124,status:'pub',lat:true,featured:true},
+  {id:13,date:20,cat:'perf',catL:'공연',title:'우리, 오늘은 문화로 놀아요 (재즈)',time:'16:30~18:30',place:'해남군민광장',who:'누구나',price:'무료',contact:'535-6285',desc:'재즈 콘서트 공연, 캐리커처 및 키링 만들기 체험',saves:51,status:'pub',lat:true},
+  {id:14,date:21,cat:'edu',catL:'체험',title:'해남의 차 교육 (목)',time:'14:00~18:00',place:'은적사 일원',who:'누구나',price:'무료',contact:'533-5345',desc:'국가유산체험 및 ESG 생태체험',saves:31,status:'pub'},
+  {id:15,date:22,cat:'edu',catL:'체험',title:'해남의 차 교육 (금)',time:'14:00~18:00',place:'은적사 일원',who:'누구나',price:'무료',contact:'533-5345',desc:'국가유산체험 및 ESG 생태체험',saves:31,status:'pub'},
+  {id:16,date:24,cat:'evt',catL:'행사',title:'석가탄신일 봉축 법요식',time:'10:30~',place:'대흥사 대웅보전 앞마당',who:'누구나',price:'무료',contact:'530-5502',desc:'육법공양, 봉축사, 청법가 등 기념식',saves:49,status:'pub',lat:true},
+  {id:17,date:27,cat:'perf',catL:'공연',title:'시니어를 위한 행복 콘서트',time:'12:50~',place:'해남노인복지관',who:'누구나(무료)',price:'무료',contact:'530-5138',desc:'트로트 등 공연. 해남시니어예술단',saves:54,status:'pub'},
+  {id:18,date:28,cat:'perf',catL:'공연',title:'가족뮤지컬 "백설공주"',time:'10:30 / 13:00 (2회)',place:'해남문화예술회관 대공연장',who:'24개월~초등 저학년 · 무료',price:'무료',contact:'530-5137',desc:'백설공주 뮤지컬 공연(50분). 오전·오후 2회',saves:68,status:'pub',lat:true,featured:true},
+  {id:19,date:29,cat:'edu',catL:'체험',title:'해남의 차 교육 (금)',time:'14:00~18:00',place:'은적사 일원',who:'누구나',price:'무료',contact:'533-5345',desc:'국가유산체험 및 ESG 생태체험',saves:31,status:'pub'},
+  {id:20,date:30,cat:'perf',catL:'공연',title:'우리, 오늘은 문화로 놀아요 (가족)',time:'16:00~18:00',place:'북평면 해월루',who:'누구나',price:'무료',contact:'535-6285',desc:'재즈 콘서트, 캐리커처 및 키링 만들기 체험',saves:43,status:'pub'},
+  {id:21,date:30,cat:'perf',catL:'공연',title:'해남을 품은 시인들',time:'18:30~',place:'땅끝순례문학관',who:'누구나',price:'무료',contact:'530-5128',desc:'성악 등 공연. 해남 고산문학팀 주관',saves:21,status:'pub'}
+];
+events.forEach(function(e){
+  if(!e.year) e.year = 2026;
+  if(e.month === undefined) e.month = 4; // 0-indexed
+  if(!e.featured) e.featured = false;
+});
+
+var visitorData = {
+  total:2847, today:183,
+  week:[142,168,195,211,178,203,183],
+  labels:['5.11','5.12','5.13','5.14','5.15','5.16','5.17(오늘)']
+};
+
+var CC = {
+  perf:{bg:'var(--perf-bg)',c:'var(--perf)',dot:'#C14B22'},
+  trad:{bg:'var(--trad-bg)',c:'var(--trad)',dot:'#4A3A9A'},
+  exhi:{bg:'var(--exhi-bg)',c:'var(--exhi)',dot:'#1558A0'},
+  edu:{bg:'var(--edu-bg)',c:'var(--edu)',dot:'#2A6B1A'},
+  fest:{bg:'var(--fest-bg)',c:'var(--fest)',dot:'#8A5200'},
+  evt:{bg:'var(--evt-bg)',c:'var(--evt)',dot:'#555050'}
+};
+var HS = '<span style="color:#E04070">♥</span>';
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+function getByDate(d, y, m) {
+  var ey = (y !== undefined) ? y : TODAY_Y;
+  var em = (m !== undefined) ? m : TODAY_M;
+  return events.filter(function(e) {
+    if (e.status === 'hidden') return false;
+    if (e.year !== ey || e.month !== em) return false;
+    return e.end ? (d >= e.date && d <= e.end) : (e.date === d);
+  });
+}
+function isFree(e){ return e.price==='무료'||e.price==='체험비 무료'; }
+function hTag(e){ return '<span class="ctag" style="background:'+CC[e.cat].bg+';color:'+CC[e.cat].c+'">'+e.catL+'</span>'; }
+function pubEvents(){ return events.filter(function(e){return e.status==='pub';}); }
+
+// ══════════════════════════════════════════════
+//  LAYOUT
+// ══════════════════════════════════════════════
+function applyLayout() {
+  var w = window.innerWidth || document.documentElement.clientWidth || 800;
+  _isPC = w >= 1024;
+  // CSS @media가 이미 처리 — JS는 inline style로 보조
+  var mob = document.getElementById('mobile-app');
+  var pc  = document.getElementById('pc-app');
+  if (mob) mob.style.display = _isPC ? 'none' : 'flex';
+  if (pc)  pc.style.display  = _isPC ? 'grid' : 'none';
+}
+applyLayout();
+window.addEventListener('resize', function() {
+  var wasPC = _isPC;
+  applyLayout();
+  if (_isPC && !wasPC) renderPcDash();
+});
+
+// ══════════════════════════════════════════════
+//  MOBILE NAV
+// ══════════════════════════════════════════════
+function setVt(id){
+  document.querySelectorAll('.vt').forEach(function(t){t.classList.remove('on');});
+  var e=document.getElementById(id); if(e) e.classList.add('on');
+}
+function setBn(id){
+  document.querySelectorAll('.bn').forEach(function(b){b.classList.remove('on');});
+  var e=document.getElementById(id); if(e) e.classList.add('on');
+}
+function showTab(v){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  var e=document.getElementById('tab-'+v); if(e) e.classList.add('on');
+}
+function goToday(){
+  closeAllOv();
+  currentDay=TODAY; selCalDay=null;
+  showTab('day'); setVt('vt-day'); setBn('bn-cal');
+  buildStrip(TODAY); renderDay(TODAY);
+  document.getElementById('m-main').scrollTop=0;
+}
+function swTab(v,vtId){
+  closeAllOv();
+  showTab(v); setVt(vtId); setBn('bn-cal');
+}
+function showMap(){
+  closeAllOv();
+  showTab('map'); setVt(''); setBn('bn-map');
+}
+
+// ── overlays ──────────────────────────────────
+function closeAllOv(){
+  document.querySelectorAll('.ov').forEach(function(o){o.classList.remove('open');});
+  document.querySelectorAll('.ibtn').forEach(function(b){b.classList.remove('on');});
+}
+function closeOv(k){
+  var ov=document.getElementById('ov-'+k); if(ov) ov.classList.remove('open');
+  var btn=document.getElementById('btn-'+k); if(btn) btn.classList.remove('on');
+  setBn('bn-cal');
+}
+function openOv(k){
+  closeAllOv();
+  if(k==='saved') renderSaved();
+  if(k==='search'){
+    var inp=document.getElementById('search-inp');
+    if(inp){inp.value=''; setTimeout(function(){inp.focus();},100);}
+    document.getElementById('search-res').innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--mu);font-size:14px;line-height:1.7;">행사명, 장소, 카테고리로 검색해 보세요</div>';
+  }
+  var ov=document.getElementById('ov-'+k); if(ov) ov.classList.add('open');
+  var btn=document.getElementById('btn-'+k); if(btn) btn.classList.add('on');
+  if(k==='saved') setBn('bn-saved');
+}
+function renderSaved(){
+  var keys=Object.keys(saved);
+  document.getElementById('saved-lbl').textContent=keys.length+'개';
+  var body=document.getElementById('saved-body');
+  if(!keys.length){body.innerHTML='<div class="saved-empty">💚<br><br>아직 담은 행사가 없어요<br>마음에 드는 행사의 하트를 눌러보세요</div>'; return;}
+  var evs=keys.map(function(k){return saved[k];}).sort(function(a,b){return a.date-b.date;});
+  body.innerHTML=evs.map(function(ev){
+    var diff=ev.date-TODAY;
+    var ddCls=diff<0?'past':diff===0?'today':'soon';
+    var ddTxt=diff<0?'지남':diff===0?'오늘!':'D-'+diff;
+    var isCan=ev.status==='cancelled';
+    return '<div class="sev'+(isCan?' cancelled':'')+'">'+
+      '<div class="sev-top">'+hTag(ev)+(isFree(ev)?'<span class="ftag">무료</span>':'')+(isCan?'<span class="cantag">취소됨</span>':'')+'<span class="dday '+ddCls+'">'+ddTxt+'</span></div>'+
+      '<div class="sev-name">'+(isCan?'<s>'+ev.title+'</s>':ev.title)+'</div>'+
+      '<div class="sev-meta">'+(TODAY_M+1)+'.'+ev.date+(ev.end&&ev.end<=31?'~'+ev.end:'')+'일 '+ev.time+'</div>'+
+      '<div class="sev-meta">'+ev.place+'</div>'+
+      '<div class="sev-acts">'+
+        '<button class="sev-btn" onclick="showToast(\'☎ 061-'+ev.contact+'\')">📞 문의</button>'+
+        '<button class="sev-btn" onclick="openModal('+ev.id+')">자세히</button>'+
+        '<button class="sev-del" onclick="toggleSave('+ev.id+',null);renderSaved()">담기 취소</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+// ── search ────────────────────────────────────
+function doSearch(q){
+  var r=document.getElementById('search-res'); q=q.trim();
+  if(!q){r.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--mu);font-size:14px">검색어를 입력하세요</div>';return;}
+  var found=events.filter(function(e){
+    if(e.status==='hidden')return false;
+    var s=q.toLowerCase();
+    return e.title.toLowerCase().includes(s)||e.place.toLowerCase().includes(s)||e.catL.includes(s)||e.desc.toLowerCase().includes(s);
+  });
+  if(!found.length){r.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--mu);font-size:14px">"'+q+'"에 해당하는 행사를 찾을 수 없어요</div>';return;}
+  r.innerHTML='<div style="font-size:12px;color:var(--mu);margin-bottom:10px;font-weight:500;padding:0 12px">'+found.length+'개의 행사를 찾았어요</div>'+
+    found.map(function(ev){
+      var on=!!saved[ev.id];
+      return '<div class="evc" style="margin:0 12px 8px" onclick="openModal('+ev.id+')">'+
+        '<div class="ev-top"><div class="ev-tags">'+hTag(ev)+(isFree(ev)?'<span class="ftag">무료</span>':'')+'</div>'+
+        '<button class="hbtn'+(on?' on':'')+'" onclick="event.stopPropagation();toggleSave('+ev.id+',this)">'+(on?'♥':'♡')+'</button></div>'+
+        '<div class="ev-title">'+ev.title+'</div>'+
+        '<div class="ev-meta">⏱ '+ev.time+'</div>'+
+        '<div class="ev-meta">📍 '+ev.place+'</div></div>';
+    }).join('');
+}
+
+// ── 큰글씨 ───────────────────────────────────
+function toggleLarge(btn){
+  document.body.classList.toggle('large');
+  var on=document.body.classList.contains('large');
+  btn.classList.toggle('on',on);
+  showToast(on?'큰 글씨 모드 켜짐 👁':'기본 글씨로 전환');
+}
+var logoTap=0;
+document.getElementById('logo-btn').addEventListener('click',function(){
+  logoTap++;
+  if(logoTap===1) setTimeout(function(){logoTap=0;},400);
+  if(logoTap>=2){logoTap=0; var t=document.getElementById('large-tog'); if(t){t.classList.toggle('on');toggleLarge(t);}}
+});
+
+// ══════════════════════════════════════════════
+//  DATE STRIP
+// ══════════════════════════════════════════════
+function buildStrip(c){
+  var s=document.getElementById('dstrip'); s.innerHTML='';
+  var days=[]; for(var i=-2;i<=8;i++){var d=c+i; if(d>=1&&d<=31)days.push(d);}
+  days.forEach(function(d){
+    var evs=getByDate(d, TODAY_Y, TODAY_M);
+    var label=d===TODAY?'오늘':DOW[getDow(d)];
+    var el=document.createElement('div');
+    el.className='db'+(d===currentDay?' cur':'')+(evs.length===0?' noev':'');
+    // dots
+    var cats={}; evs.forEach(function(e){if(e.status!=='hidden')cats[e.cat]=1;});
+    var keys=Object.keys(cats);
+    var dotsHtml='';
+    if(keys.length<=3){
+      dotsHtml=keys.map(function(k){return '<div class="ddot" style="background:'+CC[k].dot+'"></div>';}).join('');
+    } else {
+      dotsHtml=keys.slice(0,2).map(function(k){return '<div class="ddot" style="background:'+CC[k].dot+'"></div>';}).join('')+'<span class="cal-more">+'+evs.length+'</span>';
+    }
+    el.innerHTML='<span class="dow">'+label+'</span><span class="dnum">'+d+'</span><div class="ddots">'+dotsHtml+'</div>';
+    (function(dd){el.onclick=function(){currentDay=dd;buildStrip(dd);renderDay(dd);};})(d);
+    s.appendChild(el);
+  });
+  setTimeout(function(){var c2=s.querySelector('.cur');if(c2)c2.scrollIntoView({inline:'center',behavior:'smooth'});},50);
+}
+
+// ══════════════════════════════════════════════
+//  DAY RENDER
+// ══════════════════════════════════════════════
+function renderDay(d){
+  var evs=getByDate(d, TODAY_Y, TODAY_M);
+  document.getElementById('day-title').textContent=(TODAY_M+1)+'월 '+d+'일 행사';
+  document.getElementById('day-cnt').textContent=evs.length+'건';
+  var el=document.getElementById('day-content');
+  if(!evs.length){
+    var next=[]; for(var i=d+1;i<=31&&next.length<3;i++){var ne=getByDate(i,TODAY_Y,TODAY_M);if(ne.length)next.push({d:i,ev:ne[0]});}
+    el.innerHTML='<div class="empty-box"><div class="empty-ico">📭</div><div class="empty-msg">이 날은 행사가 없어요<br>가까운 날짜를 확인해 보세요</div>'+
+      (next.length?'<div class="near-wrap">'+next.map(function(n){return '<div class="near-item" onclick="currentDay='+n.d+';buildStrip('+n.d+');renderDay('+n.d+')"><span class="near-date">'+(TODAY_M+1)+'.'+n.d+'</span><div class="near-info"><div class="near-name">'+n.ev.title+'</div><div class="near-sub">'+n.ev.time+' · '+(isFree(n.ev)?'무료':n.ev.price)+'</div></div><span style="color:var(--hi);font-size:18px">›</span></div>';}).join('')+'</div>':'')+'</div>';
+    return;
+  }
+  el.innerHTML='<div class="evlist">'+evs.map(function(ev,i){
+    var on=!!saved[ev.id], isCan=ev.status==='cancelled';
+    return '<div class="evc'+(isCan?' cancelled':'')+'" style="animation-delay:'+i*.04+'s" onclick="openModal('+ev.id+')">'+
+      '<div class="ev-top"><div class="ev-tags">'+hTag(ev)+(isFree(ev)&&!isCan?'<span class="ftag">무료</span>':'')+(ev.saves>=50&&!isCan?'<span class="htag">🔥'+ev.saves+'</span>':'')+(isCan?'<span class="cantag">⚠취소됨</span>':'')+(ev.featured&&!isCan?'<span class="feat-badge">HOT</span>':'')+'</div>'+
+      '<button class="hbtn'+(on?' on':'')+'" onclick="event.stopPropagation();toggleSave('+ev.id+',this)">'+(on?'♥':'♡')+'</button></div>'+
+      '<div class="ev-title'+(isCan?' strike':'')+'">'+ev.title+'</div>'+
+      '<div class="ev-meta">⏱ '+ev.time+(ev.end&&ev.end<=31?' · '+ev.date+'~'+ev.end+'일':'')+'</div>'+
+      '<div class="ev-meta">📍 '+ev.place+'</div>'+
+      '<div class="ev-meta">👤 '+ev.who+'</div>'+
+      '<div class="ev-bot"><div class="saves">'+HS+' <span class="snum">'+ev.saves+'</span>명이 담았어요</div>'+
+      (isCan?'<span style="font-size:11px;color:var(--red);font-weight:700">취소된 행사입니다</span>':'<button class="gobt" onclick="event.stopPropagation();openModal('+ev.id+')">자세히 →</button>')+
+      '</div></div>';
+  }).join('')+'</div>';
+}
+
+// ══════════════════════════════════════════════
+//  WEEK
+// ══════════════════════════════════════════════
+function buildWeek(){
+  var mon=TODAY-((getDow(TODAY)+6)%7);
+  var days=[]; for(var i=0;i<7;i++){var d=mon+i;if(d>=1&&d<=31)days.push(d);}
+  document.getElementById('week-rng').textContent=(TODAY_M+1)+'.'+days[0]+'~'+days[days.length-1];
+  document.getElementById('week-body').innerHTML=days.map(function(d){
+    var evs=getByDate(d,TODAY_Y,TODAY_M);
+    var label=DOW[getDow(d)]+' '+d+'일'+(d===TODAY?' (오늘)':'');
+    var hdCls='wdhd'+(d===TODAY?' tod':'')+(evs.length===0?' noev':'');
+    return '<div class="wday"><div class="'+hdCls+'"><span>'+(d===TODAY?'● ':'')+label+'</span><span>'+evs.length+'건</span></div>'+
+      (evs.length===0?'<div class="wk-empty">행사 없음</div>':evs.map(function(ev){
+        var on=!!saved[ev.id],isCan=ev.status==='cancelled';
+        return '<div class="wev" onclick="openModal('+ev.id+')"><div class="wdot" style="background:'+CC[ev.cat].dot+';opacity:'+(isCan?.4:1)+'"></div>'+
+          '<div class="winfo"><div class="wname">'+(isCan?'⚠ ':'')+ev.title+'</div><div class="wmeta">'+ev.time+' · '+ev.place.split(' ')[0]+(isFree(ev)?' · 무료':' · '+ev.price)+'</div></div>'+
+          '<div class="wsaves">'+ev.saves+'</div>'+
+          '<button class="whbt'+(on?' on':'')+'" onclick="event.stopPropagation();toggleSave('+ev.id+',this)">'+(on?'♥':'♡')+'</button></div>';
+      }).join(''))+'</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  MONTH
+// ══════════════════════════════════════════════
+function buildCal(){
+  var m=calM.m, y=calM.y, d=dIM(y,m), off=calOff(y,m);
+  document.getElementById('cal-title').textContent=y+'년 '+(m+1)+'월';
+  var g=document.getElementById('calgrid'); g.innerHTML='';
+  DOW.forEach(function(dw){var c=document.createElement('div');c.className='cdow';c.textContent=dw;g.appendChild(c);});
+  for(var i=0;i<off;i++){var e=document.createElement('div');e.className='cc emp';g.appendChild(e);}
+  for(var dd=1;dd<=d;dd++){
+    var evs=getByDate(dd,y,m);
+    var isTod=(dd===TODAY&&m===TODAY_M&&y===TODAY_Y);
+    var isSel=(dd===selCalDay&&m===calM.m&&y===calM.y);
+    var cell=document.createElement('div');
+    cell.className='cc'+(isTod?' tod':'')+(isSel?' sel':'');
+    var num=document.createElement('span'); num.className='cnum'; num.textContent=dd; cell.appendChild(num);
+    // dots
+    var cats={}; evs.forEach(function(e){if(e.status!=='hidden')cats[e.cat]=1;});
+    var keys=Object.keys(cats);
+    var dotWrap=document.createElement('div'); dotWrap.className='cdots';
+    if(keys.length>0&&keys.length<=3){
+      keys.forEach(function(k){var dt=document.createElement('div');dt.className='cdot2';dt.style.background=CC[k].dot;dotWrap.appendChild(dt);});
+    } else if(keys.length>3){
+      keys.slice(0,2).forEach(function(k){var dt=document.createElement('div');dt.className='cdot2';dt.style.background=CC[k].dot;dotWrap.appendChild(dt);});
+      var more=document.createElement('span'); more.className='cal-more'; more.textContent='+'+evs.length; dotWrap.appendChild(more);
+    }
+    cell.appendChild(dotWrap);
+    (function(ddd){cell.onclick=function(){
+      selCalDay=ddd; currentDay=ddd;
+      showTab('day'); setVt('vt-day'); setBn('bn-cal');
+      buildStrip(ddd); renderDay(ddd); buildCal();
+      document.getElementById('m-main').scrollTop=0;
+    };})(dd);
+    g.appendChild(cell);
+  }
+}
+function changeMonth(dir){
+  calM.m+=dir;
+  if(calM.m<0){calM.m=11;calM.y--;}
+  if(calM.m>11){calM.m=0;calM.y++;}
+  buildCal();
+  var cnt=events.filter(function(e){return e.status!=='hidden'&&e.year===calM.y&&e.month===calM.m;}).length;
+  if(!cnt) showToast(calM.y+'년 '+(calM.m+1)+'월에는 등록된 행사가 없어요');
+}
+
+// ══════════════════════════════════════════════
+//  HOT
+// ══════════════════════════════════════════════
+function buildHot(){
+  var seen={};
+  var featured=pubEvents().filter(function(e){return e.featured;});
+  var normal=pubEvents().filter(function(e){return !e.featured;}).sort(function(a,b){return b.saves-a.saves;});
+  var top=featured.concat(normal).filter(function(e){if(seen[e.id])return false;seen[e.id]=1;return true;}).slice(0,8);
+  document.getElementById('hotlist').innerHTML=top.map(function(ev,i){
+    var rc=i===0?'g':i===1?'s':i===2?'b':'';
+    return '<div class="hitem'+(ev.featured?' feat':'')+'" onclick="openModal('+ev.id+')">'+
+      '<span class="hrank '+rc+'">'+(i+1)+'</span>'+
+      '<div class="hinfo"><div class="hname">'+ev.title+(ev.featured?'<span class="feat-badge">HOT</span>':'')+'</div>'+
+      '<div class="hsub">'+hTag(ev)+(TODAY_M+1)+'.'+ev.date+(ev.end&&ev.end<=31?'~'+ev.end:'')+(isFree(ev)?' · 무료':' · '+ev.price)+'</div></div>'+
+      '<div class="hsaves">'+HS+' '+ev.saves+'</div></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  MAP
+// ══════════════════════════════════════════════
+function buildMapList(){
+  var future=events.filter(function(e){
+    if(e.status!=='pub'||!e.lat)return false;
+    if((e.end||e.date)<TODAY)return false;
+    if(mapF!=='전체'&&e.catL!==mapF)return false;
+    return true;
+  });
+  var el=document.getElementById('map-evlist');
+  if(!future.length){el.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--mu)">해당 조건의 오늘 이후 행사가 없어요</div>';return;}
+  el.innerHTML=future.map(function(ev){
+    var diff=ev.date-TODAY;
+    var ddT=diff===0?'오늘':diff>0?'D-'+diff:'진행중';
+    var ddC=diff<=0?'color:var(--G)':'color:var(--edu)';
+    return '<div class="map-ev" onclick="openModal('+ev.id+')"><div class="map-ev-bar" style="background:'+CC[ev.cat].dot+'"></div>'+
+      '<div><div class="map-ev-name">'+ev.title+'</div>'+
+      '<div class="map-ev-meta">'+ev.time+' · '+ev.place+'</div>'+
+      '<div class="map-ev-dday" style="'+ddC+'">'+ddT+(isFree(ev)?' · 무료':' · '+ev.price)+'</div></div></div>';
+  }).join('');
+}
+function setMapF(f,btn){
+  mapF=f;
+  document.querySelectorAll('.mfchip').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  buildMapList();
+}
+
+// ══════════════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════════════
+function openModal(id){
+  var ev=events.find(function(e){return e.id===id;}); if(!ev)return;
+  curModal=ev;
+  var on=!!saved[ev.id], isCan=ev.status==='cancelled';
+  var al=document.getElementById('m-alert');
+  if(isCan){al.style.display='block';al.textContent='⚠ 이 행사는 취소되었습니다. 자세한 사항은 문의처로 확인해 주세요.';}
+  else al.style.display='none';
+  document.getElementById('m-cat').innerHTML=hTag(ev)+(isFree(ev)&&!isCan?'<span class="ftag">무료</span>':'')+(isCan?'<span class="cantag">취소됨</span>':'')+(ev.featured&&!isCan?'<span class="feat-badge">HOT</span>':'');
+  document.getElementById('m-title').innerHTML=isCan?'<s style="color:var(--red)">'+ev.title+'</s>':ev.title;
+  document.getElementById('m-rows').innerHTML=[
+    ['일정',(TODAY_M+1)+'월 '+ev.date+'일'+(ev.end&&ev.end<=31?' ~ '+ev.end+'일':'')+' '+ev.time],
+    ['장소',ev.place],['대상',ev.who],['가격',ev.price],
+    ['주최','해남군 문화예술과'],['문의','☎ 061-'+ev.contact]
+  ].map(function(r){return '<div class="m-row"><span class="m-lbl">'+r[0]+'</span><span class="m-val">'+r[1]+'</span></div>';}).join('');
+  document.getElementById('m-desc').textContent=ev.desc;
+  document.getElementById('m-saves').innerHTML=HS+' <b>'+ev.saves+'명</b>이 이 행사를 담았어요';
+  document.getElementById('m-call').onclick=function(){showToast('☎ 061-'+ev.contact+' 연결 중...');};
+  var sb=document.getElementById('m-savebtn');
+  sb.innerHTML=on?'♥ 담기 취소':'♡ 담기'; sb.className='m-save'+(on?' saved':'');
+  document.getElementById('backdrop').classList.add('open');
+}
+function modalSave(){
+  if(!curModal)return;
+  toggleSave(curModal.id,null);
+  var on=!!saved[curModal.id];
+  var sb=document.getElementById('m-savebtn');
+  sb.innerHTML=on?'♥ 담기 취소':'♡ 담기'; sb.className='m-save'+(on?' saved':'');
+}
+function closeMod(){document.getElementById('backdrop').classList.remove('open');}
+
+// ══════════════════════════════════════════════
+//  SAVE
+// ══════════════════════════════════════════════
+function toggleSave(id,btn){
+  var ev=events.find(function(e){return e.id===id;});
+  if(saved[id]){
+    delete saved[id];
+    if(btn){btn.classList.remove('on');btn.textContent='♡';}
+    showToast('담기 취소됐어요');
+  } else {
+    saved[id]=ev;
+    if(btn){btn.classList.add('on');btn.textContent='♥';}
+    showToast('"'+(ev.title.length>14?ev.title.slice(0,14)+'…':ev.title)+'" 담았어요!');
+  }
+  var cnt=Object.keys(saved).length;
+  document.getElementById('hbadge').style.display=cnt?'block':'none';
+  renderDay(currentDay); buildWeek();
+}
+
+// ══════════════════════════════════════════════
+//  ADMIN MOBILE
+//  swAdm: adm-sec 클래스 기반 show/hide
+// ══════════════════════════════════════════════
+function swAdm(v, btn){
+  // adm-mob 내부의 .adm-sec 만 대상
+  var mob=document.getElementById('adm-mob');
+  if(mob){
+    mob.querySelectorAll('.adm-sec').forEach(function(s){s.classList.remove('on');});
+    mob.querySelectorAll('.adm-vt').forEach(function(t){t.classList.remove('on');});
+  }
+  var sec=document.getElementById('adm-'+v); if(sec) sec.classList.add('on');
+  if(btn) btn.classList.add('on');
+  // 탭별 렌더
+  if(v==='mgr')  renderAdmMgr();
+  if(v==='hot')  renderHotMgr();
+  if(v==='stats') renderAdmStats();
+}
+
+function openAdm(){
+  // 대시보드 초기화
+  var remain=pubEvents().filter(function(e){return (e.end||e.date)>=TODAY;}).length;
+  var el=document.getElementById('adm-remain'); if(el) el.textContent=remain;
+  // TOP5
+  var seen={};
+  var top=pubEvents().sort(function(a,b){return b.saves-a.saves;}).filter(function(e){if(seen[e.id])return false;seen[e.id]=1;return true;}).slice(0,5);
+  var tEl=document.getElementById('adm-top5');
+  if(tEl) tEl.innerHTML=top.map(function(ev,i){return '<div class="adm-row"><span style="font-size:15px;font-weight:700;min-width:22px;color:var(--hi)">'+(i+1)+'</span><div class="adm-ev-info"><div class="adm-ev-title">'+ev.title+'</div><div class="adm-ev-meta">'+ev.catL+' · '+(TODAY_M+1)+'.'+ev.date+'</div></div><span class="adm-saves">'+HS+ev.saves+'</span></div>';}).join('');
+  document.getElementById('adm-mob').classList.add('open');
+}
+
+function renderAdmMgr(){
+  var sorted=events.slice().sort(function(a,b){return a.date-b.date;});
+  if(admSF) sorted=sorted.filter(function(e){return e.status===admSF;});
+  if(admQ) sorted=sorted.filter(function(e){return e.title.toLowerCase().includes(admQ.toLowerCase());});
+  var el=document.getElementById('adm-mgr-list'); if(!el)return;
+  el.innerHTML=sorted.map(function(ev){
+    var st=ev.status;
+    var rowCls='adm-row'+(st==='hidden'?' hid':st==='cancelled'?' can':'')+(ev.featured&&st==='pub'?' feat':'');
+    var stBadge='<span class="adm-status '+(st==='pub'?'st-pub':st==='hidden'?'st-hid':'st-can')+'">'+(st==='pub'?'공개':st==='hidden'?'숨김':'취소')+'</span>'+(ev.featured&&st==='pub'?'<span class="feat-badge" style="margin-left:4px">HOT</span>':'');
+    var btns='<div class="adm-btns"><button class="adm-btn edit" onclick="openEdit('+ev.id+')">수정</button>';
+    if(st==='pub'){
+      btns+='<button class="adm-btn '+(ev.featured?'hot':' hot')+'" onclick="setFeatured('+ev.id+','+(!ev.featured)+')">'+(ev.featured?'HOT해제':'🔥HOT')+'</button>';
+      btns+='<button class="adm-btn hide" onclick="setStatus('+ev.id+',\'hidden\')">숨김</button>';
+      btns+='<button class="adm-btn canc" onclick="setStatus('+ev.id+',\'cancelled\')">취소</button>';
+    } else {
+      btns+='<button class="adm-btn rest" onclick="setStatus('+ev.id+',\'pub\')">복원</button>';
+    }
+    btns+='</div>';
+    return '<div class="'+rowCls+'">'+stBadge+'<div class="adm-ev-info"><div class="adm-ev-title">'+ev.title+'</div><div class="adm-ev-meta">'+(TODAY_M+1)+'.'+ev.date+(ev.end&&ev.end<=31?'~'+ev.end:'')+'일 · '+ev.catL+'</div></div><span class="adm-saves">'+HS+ev.saves+'</span>'+btns+'</div>';
+  }).join('');
+}
+
+function renderHotMgr(){
+  var featured=pubEvents().filter(function(e){return e.featured;});
+  var notFeat=pubEvents().filter(function(e){return !e.featured;});
+  // 현재 HOT
+  var fEl=document.getElementById('hot-featured-list');
+  if(fEl){
+    var cnt=featured.length;
+    var cntLbl=document.getElementById('hot-cnt-lbl');
+    if(cntLbl) cntLbl.innerHTML=cnt===0?'<span style="color:var(--mu)">미지정</span>':cnt<=3?'<span style="color:var(--G);font-weight:700">'+cnt+'개 (최적)</span>':'<span style="color:var(--red);font-weight:700">'+cnt+'개 — 3개 이내 권장</span>';
+    if(!featured.length){fEl.innerHTML='<div style="padding:14px;text-align:center;color:var(--mu);font-size:13px">HOT 지정된 행사가 없어요</div>';}
+    else fEl.innerHTML=featured.map(function(ev){
+      return '<div class="adm-row feat"><span style="font-size:18px;flex-shrink:0">🔥</span><div class="adm-ev-info"><div class="adm-ev-title" style="color:#8A5200">'+ev.title+'</div><div class="adm-ev-meta">'+ev.catL+' · '+(TODAY_M+1)+'.'+ev.date+' · 담기 '+ev.saves+'명</div></div><button class="adm-btn rest" onclick="setFeatured('+ev.id+',false)">해제</button></div>';
+    }).join('');
+  }
+  // 전체 목록
+  var filtered=notFeat.filter(function(e){return hotFilter==='all'||e.catL===hotFilter;}).sort(function(a,b){return b.saves-a.saves;});
+  var aEl=document.getElementById('hot-all-list');
+  if(!aEl)return;
+  if(!filtered.length){aEl.innerHTML='<div style="padding:14px;text-align:center;color:var(--mu);font-size:13px">해당 조건의 행사가 없어요</div>';return;}
+  aEl.innerHTML=filtered.map(function(ev,i){
+    var topLabel=i<3?'<span style="font-size:9px;color:var(--G);margin-left:4px">담기 TOP '+(i+1)+'</span>':'';
+    return '<div class="adm-row"><div style="font-size:13px;font-weight:700;min-width:20px;color:var(--hi)">'+(i+1)+'</div>'+
+      '<div class="adm-ev-info"><div class="adm-ev-title">'+ev.title+topLabel+'</div><div class="adm-ev-meta">'+ev.catL+' · '+(TODAY_M+1)+'.'+ev.date+'</div></div>'+
+      '<span class="adm-saves">'+HS+ev.saves+'</span>'+
+      '<button class="adm-btn hot" onclick="setFeatured('+ev.id+',true)">🔥 HOT 지정</button></div>';
+  }).join('');
+}
+function setHotFilter(f, btn){
+  hotFilter=f;
+  document.querySelectorAll('#hot-filter-row .mfchip').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  renderHotMgr();
+}
+
+function renderAdmStats(){
+  // 방문자 차트
+  var chartEl=document.getElementById('visit-chart');
+  if(chartEl){
+    var maxV=Math.max.apply(null,visitorData.week);
+    chartEl.innerHTML=visitorData.week.map(function(v,i){
+      var pct=Math.round(v/maxV*100);
+      var isToday=i===visitorData.week.length-1;
+      return '<div class="vis-bar-wrap"><span class="vis-label">'+visitorData.labels[i]+'</span><div class="vis-bar-bg"><div class="vis-bar" style="width:'+pct+'%;background:'+(isToday?'var(--G)':'#7CB9A0')+'"></div></div><span class="vis-num">'+v+'</span></div>';
+    }).join('');
+  }
+  // TOP5
+  var seen={};
+  var top=pubEvents().sort(function(a,b){return b.saves-a.saves;}).filter(function(e){if(seen[e.id])return false;seen[e.id]=1;return true;}).slice(0,5);
+  var tEl=document.getElementById('stats-top5');
+  if(tEl) tEl.innerHTML=top.map(function(ev,i){return '<div class="adm-row"><span style="font-size:14px;font-weight:700;min-width:20px;color:var(--hi)">'+(i+1)+'</span><div class="adm-ev-info"><div class="adm-ev-title">'+ev.title+'</div><div class="adm-ev-meta">'+ev.catL+'</div></div><span class="adm-saves">'+HS+ev.saves+'</span></div>';}).join('');
+  // 카테고리
+  var catT={}; events.filter(function(e){return e.status==='pub';}).forEach(function(e){catT[e.catL]=(catT[e.catL]||0)+e.saves;});
+  var maxC=Math.max.apply(null,Object.values(catT));
+  var cEl=document.getElementById('stats-cat');
+  if(cEl) cEl.innerHTML=Object.keys(catT).sort(function(a,b){return catT[b]-catT[a];}).map(function(cat){
+    var v=catT[cat], pct=Math.round(v/maxC*100);
+    return '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:700">'+cat+'</span><span style="color:#E04070;font-weight:700">'+v+'명</span></div><div style="background:var(--bg);border-radius:5px;height:9px"><div style="background:var(--G);width:'+pct+'%;height:100%;border-radius:5px;transition:width .5s"></div></div></div>';
+  }).join('');
+}
+
+function setStatus(id, status){
+  var ev=events.find(function(e){return e.id===id;}); if(!ev)return;
+  ev.status=status;
+  showToast(status==='hidden'?'숨김 처리 완료 (복원 가능)':status==='cancelled'?'취소 표시 완료 (복원 가능)':'복원 완료 ✓');
+  renderAdmMgr(); buildHot(); buildCal(); buildWeek(); renderDay(currentDay);
+  if(_isPC){renderPcMgr(); renderPcHidden(); renderPcDash();}
+}
+
+function setFeatured(id, val){
+  var ev=events.find(function(e){return e.id===id;}); if(!ev)return;
+  ev.featured=val;
+  showToast(val?'🔥 HOT 지정 완료! 인기순·이번달 상단 노출':'HOT 해제됨');
+  renderHotMgr(); buildHot(); buildCal(); renderAdmMgr();
+  if(_isPC){renderPcMgr(); renderPcDash();}
+}
+
+// edit modal
+function openEdit(id){
+  var ev=events.find(function(e){return e.id===id;}); if(!ev)return;
+  editEv=ev;
+  // 수정 모달은 adm-mob 내 별도로 없으므로 인라인 prompt 방식
+  var newTitle=prompt('행사명을 수정하세요:', ev.title);
+  if(newTitle===null)return;
+  if(newTitle.trim()) ev.title=newTitle.trim();
+  var newPlace=prompt('장소를 수정하세요:', ev.place);
+  if(newPlace!==null&&newPlace.trim()) ev.place=newPlace.trim();
+  showToast('✅ "'+ev.title.slice(0,10)+'" 수정 저장 완료!');
+  renderAdmMgr(); renderDay(currentDay); buildWeek();
+  if(_isPC){renderPcMgr(); renderPcDash();}
+}
+
+function swUp(v,btn){
+  document.querySelectorAll('#adm-reg .up-sec').forEach(function(s){s.classList.remove('on');});
+  var el=document.getElementById('up-'+v); if(el) el.classList.add('on');
+  document.querySelectorAll('#adm-reg .utab').forEach(function(t){t.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+}
+function swUp2(v,btn){
+  document.querySelectorAll('#pc-register .up-sec').forEach(function(s){s.classList.remove('on');});
+  var el=document.getElementById('up-'+v); if(el) el.classList.add('on');
+  document.querySelectorAll('#pc-register .utab').forEach(function(t){t.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+}
+function selCat(btn,groupId){
+  var grp=document.getElementById(groupId)||btn.closest('.cat-chips');
+  grp.querySelectorAll('.cchip').forEach(function(b){
+    b.classList.remove('on');
+    var ck=b.querySelector('.chip-ck'); if(ck) ck.remove();
+  });
+  btn.classList.add('on');
+  var ck=document.createElement('span'); ck.className='chip-ck'; ck.textContent=' ✓'; btn.appendChild(ck);
+}
+function simOcr(type){
+  var pb=document.getElementById('pb-'+type);
+  var pv=document.getElementById('pv-'+type);
+  var fa=document.getElementById('fa-'+type);
+  if(pv) pv.style.display='none'; if(fa) fa.style.display='none';
+  if(pb) pb.style.display='block';
+  setTimeout(function(){if(pv) pv.style.display='block';},1200);
+  setTimeout(function(){if(pb) pb.style.display='none'; if(fa) fa.style.display='block'; showToast('✓ 분석 완료 — 내용을 확인하세요');},2200);
+}
+
+// ══════════════════════════════════════════════
+//  PC FUNCTIONS
+// ══════════════════════════════════════════════
+function pcGo(pg){
+  document.querySelectorAll('.pc-page').forEach(function(p){p.classList.remove('on');});
+  var el=document.getElementById('pc-'+pg); if(el) el.classList.add('on');
+  document.querySelectorAll('.pc-nav-btn').forEach(function(b){b.classList.remove('on');});
+  var nb=document.getElementById('pcn-'+pg); if(nb) nb.classList.add('on');
+  document.querySelectorAll('.pc-pill').forEach(function(b){b.classList.remove('on');});
+  var pb=document.getElementById('pp-'+pg); if(pb) pb.classList.add('on');
+  if(pg==='dashboard') renderPcDash();
+  if(pg==='calendar')  renderPcCal();
+  if(pg==='events')    renderPcMgr();
+  if(pg==='hidden')    renderPcHidden();
+  if(pg==='stats')     renderPcStats();
+  if(pg==='register')  {} // form은 자체 HTML
+}
+
+function renderPcDash(){
+  var remain=pubEvents().filter(function(e){return (e.end||e.date)>=TODAY;}).length;
+  var rEl=document.getElementById('pc-remain'); if(rEl) rEl.textContent=remain;
+  var r2El=document.getElementById('pc-remain2'); if(r2El) r2El.textContent=remain;
+  var seen={};
+  var top=pubEvents().sort(function(a,b){return b.saves-a.saves;}).filter(function(e){if(seen[e.id])return false;seen[e.id]=1;return true;}).slice(0,5);
+  var hl=document.getElementById('pc-top5');
+  if(hl) hl.innerHTML=top.map(function(ev,i){var rc=i===0?'g':i===1?'s':i===2?'b':'';return '<div class="pc-rank-item"><span class="pc-rank-n '+rc+'">'+(i+1)+'</span><div class="pc-rank-info"><div class="pc-rank-name">'+ev.title+'</div><div class="pc-rank-sub">'+ev.catL+' · '+(TODAY_M+1)+'.'+ev.date+(isFree(ev)?' · 무료':' · '+ev.price)+'</div></div><span class="pc-rank-saves">'+HS+' '+ev.saves+'</span></div>';}).join('');
+  var tev=getByDate(TODAY,TODAY_Y,TODAY_M);
+  var tl=document.getElementById('pc-today-list');
+  var tc=document.getElementById('pc-today-cnt'); if(tc) tc.textContent=tev.length+'건';
+  if(tl){
+    if(!tev.length){tl.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">행사 없음</div>';}
+    else tl.innerHTML=tev.map(function(ev){return '<div class="pc-ev-row" onclick="openModal('+ev.id+')"><div class="pc-ev-dot" style="background:'+CC[ev.cat].dot+'"></div><div class="pc-ev-info"><div class="pc-ev-name">'+ev.title+'</div><div class="pc-ev-meta">'+ev.time+' · '+ev.place+'</div></div>'+(isFree(ev)?'<span style="font-size:11px;font-weight:700;color:var(--edu)">무료</span>':'')+'</div>';}).join('');
+  }
+}
+
+function renderPcCal(){
+  var m=pcCalM.m, y=pcCalM.y, d=dIM(y,m), off=calOff(y,m);
+  var t=y+'년 '+(m+1)+'월';
+  var ct=document.getElementById('pc-cal-title'); if(ct) ct.textContent=t;
+  var cs=document.getElementById('pc-cal-sub'); if(cs) cs.textContent=t;
+  var g=document.getElementById('pc-calgrid'); if(!g)return;
+  g.innerHTML='';
+  DOW.forEach(function(dw){var c=document.createElement('div');c.className='pc-cdow';c.textContent=dw;g.appendChild(c);});
+  for(var i=0;i<off;i++){var e=document.createElement('div');e.className='pc-cc emp';g.appendChild(e);}
+  for(var dd=1;dd<=d;dd++){
+    var evs=getByDate(dd,y,m);
+    var isTod=(dd===TODAY&&m===TODAY_M&&y===TODAY_Y);
+    var cell=document.createElement('div'); cell.className='pc-cc'+(isTod?' tod':'');
+    var num=document.createElement('div'); num.className='pc-cn'; num.textContent=dd; cell.appendChild(num);
+    evs.slice(0,3).forEach(function(ev){var c=document.createElement('div');c.className='pc-ev-chip';c.style.color=CC[ev.cat].dot;c.textContent=(ev.featured?'★ ':'')+ev.title;cell.appendChild(c);});
+    if(evs.length>3){var more=document.createElement('div');more.className='pc-ev-chip';more.style.color='var(--mu)';more.textContent='+'+( evs.length-3)+'건';cell.appendChild(more);}
+    (function(ddd){cell.onclick=function(){document.querySelectorAll('.pc-cc').forEach(function(c){c.classList.remove('sel');});cell.classList.add('sel');renderPcDayPanel(ddd);};})(dd);
+    g.appendChild(cell);
+  }
+}
+function pcChangeMonth(dir){pcCalM.m+=dir;if(pcCalM.m<0){pcCalM.m=11;pcCalM.y--;}if(pcCalM.m>11){pcCalM.m=0;pcCalM.y++;}renderPcCal();}
+function renderPcDayPanel(d){
+  var evs=getByDate(d,pcCalM.y,pcCalM.m);
+  var dt=document.getElementById('pc-day-title'); if(dt) dt.textContent=(pcCalM.m+1)+'월 '+d+'일 ('+evs.length+'건)';
+  var dl=document.getElementById('pc-day-list'); if(!dl)return;
+  if(!evs.length){dl.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">이 날은 행사가 없어요</div>';return;}
+  dl.innerHTML=evs.map(function(ev){
+    var st=ev.status;
+    return '<div class="pc-ev-row"><div class="pc-ev-dot" style="background:'+CC[ev.cat].dot+'"></div>'+
+      '<div class="pc-ev-info"><div class="pc-ev-name">'+ev.title+'</div><div class="pc-ev-meta">'+ev.time+' · '+ev.place+'</div></div>'+
+      '<span class="pc-rank-saves">'+HS+' '+ev.saves+'</span>'+
+      '<div style="display:flex;gap:5px">'+
+        '<button class="pc-btn" style="font-size:11px;padding:4px 10px;border-color:#B8D4F8;color:var(--exhi)" onclick="openModal('+ev.id+')">상세</button>'+
+        (st==='pub'?'<button class="pc-btn" style="font-size:11px;padding:4px 10px;border-color:#F5D07A;color:#8A5200" onclick="setStatus('+ev.id+',\'hidden\')">숨김</button>':'<button class="pc-btn" style="font-size:11px;padding:4px 10px;border-color:#A8D8B8;color:var(--G)" onclick="setStatus('+ev.id+',\'pub\')">복원</button>')+
+      '</div></div>';
+  }).join('');
+}
+
+function renderPcMgr(){
+  var sorted=events.slice().sort(function(a,b){return a.date-b.date;});
+  if(admSF) sorted=sorted.filter(function(e){return e.status===admSF;});
+  if(admQ) sorted=sorted.filter(function(e){return e.title.toLowerCase().includes(admQ.toLowerCase());});
+  var tb=document.getElementById('pc-mgr-body'); if(!tb)return;
+  tb.innerHTML=sorted.map(function(ev){
+    var st=ev.status;
+    var stBadge='<span class="adm-status '+(st==='pub'?'st-pub':st==='hidden'?'st-hid':'st-can')+'">'+(st==='pub'?'공개':st==='hidden'?'숨김':'취소')+'</span>'+(ev.featured&&st==='pub'?'<span class="feat-badge" style="margin-left:3px">HOT</span>':'');
+    var btns='<button class="pc-btn" style="font-size:11px;padding:4px 9px;border-color:#B8D4F8;color:var(--exhi)" onclick="openModal('+ev.id+')">상세</button> ';
+    if(st==='pub'){
+      btns+='<button class="pc-btn" style="font-size:10px;padding:3px 7px;border-color:#F5A623;color:#8A5200" onclick="setFeatured('+ev.id+','+ (!ev.featured)+')">'+(ev.featured?'HOT해제':'🔥HOT')+'</button> ';
+      btns+='<button class="pc-btn" style="font-size:11px;padding:4px 9px;border-color:#F5D07A;color:#8A5200" onclick="setStatus('+ev.id+',\'hidden\')">숨김</button> ';
+      btns+='<button class="pc-btn" style="font-size:11px;padding:4px 9px;border-color:#F5B0A0;color:#C0392B" onclick="setStatus('+ev.id+',\'cancelled\')">취소</button>';
+    } else {
+      btns+='<button class="pc-btn" style="font-size:11px;padding:4px 9px;border-color:#A8D8B8;color:var(--G)" onclick="setStatus('+ev.id+',\'pub\')">복원</button>';
+    }
+    return '<tr><td>'+stBadge+'</td><td>'+(TODAY_M+1)+'.'+ev.date+(ev.end&&ev.end<=31?'~'+ev.end:'')+'</td><td>'+hTag(ev)+'</td><td class="td-name">'+ev.title+'</td><td style="font-size:12px;color:var(--mu)">'+ev.place.split(' ')[0]+'</td><td><span style="color:#E04070;font-weight:700">'+HS+' '+ev.saves+'</span></td><td>'+btns+'</td></tr>';
+  }).join('');
+}
+
+function renderPcHidden(){
+  var hidden=events.filter(function(e){return e.status==='hidden'||e.status==='cancelled';});
+  var hb=document.getElementById('pc-hidden-body'); if(!hb)return;
+  if(!hidden.length){hb.innerHTML='<div style="text-align:center;padding:32px;color:var(--mu);font-size:14px">숨김·취소된 행사가 없어요</div>';return;}
+  hb.innerHTML='<table class="pc-table" style="width:100%"><thead><tr><th>상태</th><th>날짜</th><th>행사명</th><th>카테고리</th><th>조치</th></tr></thead><tbody>'+
+    hidden.map(function(ev){var st=ev.status;return '<tr><td><span class="adm-status '+(st==='hidden'?'st-hid':'st-can')+'">'+(st==='hidden'?'숨김':'취소')+'</span></td><td>'+(TODAY_M+1)+'.'+ev.date+'</td><td class="td-name">'+ev.title+'</td><td>'+hTag(ev)+'</td><td><button class="pc-btn" style="font-size:11px;padding:4px 10px;border-color:#A8D8B8;color:var(--G)" onclick="setStatus('+ev.id+',\'pub\')">복원</button> <button class="pc-btn" style="font-size:11px;padding:4px 10px;border-color:#F5B0A0;color:#C0392B" onclick="showToast(\'삭제 확인 후 처리됩니다\')">영구삭제</button></td></tr>';}).join('')+
+  '</tbody></table>';
+}
+
+function renderPcStats(){
+  var seen={};
+  var top=pubEvents().sort(function(a,b){return b.saves-a.saves;}).filter(function(e){if(seen[e.id])return false;seen[e.id]=1;return true;}).slice(0,10);
+  var sl=document.getElementById('pc-stats-hot');
+  if(sl) sl.innerHTML=top.map(function(ev,i){var rc=i===0?'g':i===1?'s':i===2?'b':'';return '<div class="pc-rank-item"><span class="pc-rank-n '+rc+'">'+(i+1)+'</span><div class="pc-rank-info"><div class="pc-rank-name">'+ev.title+'</div><div class="pc-rank-sub">'+ev.catL+' · '+(TODAY_M+1)+'.'+ev.date+'</div></div><span class="pc-rank-saves">'+HS+' '+ev.saves+'</span></div>';}).join('');
+  var vc=document.getElementById('pc-visit-chart');
+  if(vc){
+    var maxV=Math.max.apply(null,visitorData.week);
+    vc.innerHTML='<div style="font-size:11px;color:var(--mu);margin-bottom:8px">※ 동일 IP 24시간 재방문 제외·봇 필터링</div>'+
+      visitorData.week.map(function(v,i){var pct=Math.round(v/maxV*100);var isToday=i===visitorData.week.length-1;return '<div class="vis-bar-wrap"><span class="vis-label" style="font-size:11px">'+visitorData.labels[i]+'</span><div class="vis-bar-bg"><div class="vis-bar" style="width:'+pct+'%;background:'+(isToday?'var(--G)':'#7CB9A0')+'"></div></div><span class="vis-num">'+v+'명</span></div>';}).join('');
+  }
+  var catT={}; events.filter(function(e){return e.status==='pub';}).forEach(function(e){catT[e.catL]=(catT[e.catL]||0)+e.saves;});
+  var maxC=Math.max.apply(null,Object.values(catT));
+  var sc=document.getElementById('pc-stats-cat');
+  if(sc) sc.innerHTML=Object.keys(catT).sort(function(a,b){return catT[b]-catT[a];}).map(function(cat){var v=catT[cat];var pct=Math.round(v/maxC*100);return '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:700">'+cat+'</span><span style="color:#E04070;font-weight:700">'+v+'명</span></div><div style="background:var(--bg);border-radius:6px;height:10px"><div style="background:var(--G);width:'+pct+'%;height:100%;border-radius:6px;transition:width .5s"></div></div></div>';}).join('');
+}
+
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(function(){t.classList.remove('show');},2300);
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+buildStrip(TODAY);
+renderDay(TODAY);
+buildWeek();
+buildCal();
+buildHot();
+buildMapList();
+// PC: 레이아웃 확인 후 렌더
+if(_isPC) renderPcDash();
+</script>
+</body>
+</html>
