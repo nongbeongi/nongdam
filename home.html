@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>농촌을담다 · Studio Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --soil: #3d2b1a;
+    --bark: #6b4c35;
+    --reed: #c4a882;
+    --straw: #e8d9c0;
+    --sky: #d4e8d4;
+    --moss: #5a7c5a;
+    --sprout: #8fad6e;
+    --mist: #f5f1eb;
+    --ink: #1e1a16;
+    --fog: #8c7d70;
+    --accent: #b85c38;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--mist);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grain overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 3.5rem 0 2rem;
+    border-bottom: 1px solid rgba(61,43,26,.12);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .brand-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-text h1 {
+    font-family: 'DM Serif Display', 'Noto Serif KR', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--soil);
+  }
+
+  .brand-text p {
+    font-size: 0.72rem;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    color: var(--fog);
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  .header-date {
+    text-align: right;
+    font-size: 0.78rem;
+    color: var(--fog);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  .header-date strong {
+    font-size: 1.1rem;
+    color: var(--bark);
+    font-weight: 500;
+    display: block;
+  }
+
+  /* ── Info strip ── */
+  .info-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(61,43,26,.1);
+    border: 1px solid rgba(61,43,26,.1);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .info-card {
+    background: #fff;
+    padding: 1.4rem 1.6rem;
+    position: relative;
+  }
+
+  .info-card:first-child { border-radius: 11px 0 0 11px; }
+  .info-card:last-child  { border-radius: 0 11px 11px 0; }
+
+  .info-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fog);
+    font-weight: 400;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .info-label svg { opacity: .5; }
+
+  .info-value {
+    font-size: 1rem;
+    color: var(--ink);
+    font-weight: 400;
+    line-height: 1.5;
+    min-height: 1.5rem;
+  }
+
+  .info-value .temp-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: var(--bark);
+    line-height: 1;
+  }
+
+  .info-value .temp-unit { font-size: 1rem; color: var(--fog); }
+
+  .info-value .weather-desc {
+    font-size: 0.78rem;
+    color: var(--fog);
+    margin-top: 4px;
+  }
+
+  .fortune-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--bark);
+    font-weight: 300;
+  }
+
+  .loading-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--reed);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: .2s; margin: 0 3px; }
+  .loading-dot:nth-child(3) { animation-delay: .4s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: .3; transform: scale(.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fog);
+    font-weight: 400;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(61,43,26,.1);
+  }
+
+  /* ── Service cards ── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .service-card {
+    display: block;
+    background: #fff;
+    border: 1px solid rgba(61,43,26,.08);
+    border-radius: 14px;
+    padding: 1.6rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--reed));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s ease;
+  }
+
+  .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(61,43,26,.1);
+    border-color: rgba(61,43,26,.16);
+  }
+
+  .service-card:hover::before { transform: scaleX(1); }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--card-bg, var(--straw));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .card-icon svg { width: 20px; height: 20px; }
+
+  .card-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fog);
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--soil);
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.78rem;
+    color: var(--fog);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .card-arrow {
+    position: absolute;
+    bottom: 1.4rem;
+    right: 1.4rem;
+    color: var(--reed);
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+    transform: translate(-4px, 4px);
+  }
+
+  .service-card:hover .card-arrow {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  /* Coming soon card */
+  .service-card.coming-soon {
+    background: var(--mist);
+    border-style: dashed;
+    cursor: default;
+  }
+
+  .service-card.coming-soon:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .service-card.coming-soon .card-title { color: var(--fog); }
+
+  .coming-badge {
+    display: inline-block;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--straw);
+    color: var(--bark);
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid rgba(61,43,26,.1);
+    padding: 2rem 0 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  footer p {
+    font-size: 0.72rem;
+    color: var(--fog);
+    font-weight: 300;
+    letter-spacing: 0.06em;
+  }
+
+  .footer-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--reed);
+    display: inline-block;
+    margin: 0 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Animations ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp .6s ease forwards;
+  }
+
+  .fade-in:nth-child(1) { animation-delay: .05s; }
+  .fade-in:nth-child(2) { animation-delay: .12s; }
+  .fade-in:nth-child(3) { animation-delay: .19s; }
+  .fade-in:nth-child(4) { animation-delay: .26s; }
+  .fade-in:nth-child(5) { animation-delay: .33s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .info-strip { grid-template-columns: 1fr; }
+    .info-card:first-child { border-radius: 11px 11px 0 0; }
+    .info-card:last-child  { border-radius: 0 0 11px 11px; }
+    .header-inner { flex-direction: column; align-items: flex-start; }
+    .header-date { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header class="fade-in">
+    <div class="header-inner">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="12" fill="#e8d9c0"/>
+          <path d="M8 34 Q16 20 24 26 Q32 32 40 14" stroke="#6b4c35" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="24" cy="26" r="3" fill="#5a7c5a"/>
+          <path d="M20 38 Q24 30 28 38" stroke="#8fad6e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M14 38 Q18 33 22 38" stroke="#c4a882" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          <path d="M26 38 Q30 33 34 38" stroke="#c4a882" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="brand-text">
+          <h1>농촌을담다</h1>
+          <p>Nongdam Studio · Dashboard</p>
+        </div>
+      </div>
+      <div class="header-date" id="dateDisplay">
+        <strong id="dateStr">—</strong>
+        <span id="dayStr">오늘도 좋은 하루</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Info strip: weather + fortune -->
+  <div class="info-strip fade-in">
+
+    <div class="info-card">
+      <div class="info-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        오늘 날씨 · 목포
+      </div>
+      <div class="info-value" id="weatherVal">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        오늘의 운세
+      </div>
+      <div class="info-value" id="fortuneVal">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Services -->
+  <div class="section-label fade-in">서비스 모음</div>
+
+  <div class="services-grid">
+
+    <a class="service-card fade-in"
+       href="https://nongbeongi.github.io/brand-manager/brand_manager_final.html"
+       style="--card-accent:#b85c38; --card-bg:#f5ede6;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b85c38" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="card-name">Brand OS v1.0</div>
+      <div class="card-title">나의 브랜드 매니저</div>
+      <div class="card-desc">브랜드 아이덴티티, 가치관, 스토리를<br>체계적으로 관리합니다.</div>
+      <div class="card-arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </a>
+
+    <a class="service-card fade-in"
+       href="https://nongbeongi.github.io/nongdam/"
+       style="--card-accent:#5a7c5a; --card-bg:#eef4ee;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#5a7c5a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <div class="card-name">Profile</div>
+      <div class="card-title">나의 프로필 매니저</div>
+      <div class="card-desc">농촌을담다 스튜디오의<br>소개와 포트폴리오 페이지.</div>
+      <div class="card-arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </a>
+
+    <a class="service-card fade-in"
+       href="https://nongbeongi.github.io/estimate/index.html"
+       style="--card-accent:#c4a882; --card-bg:#f9f4ee;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9a7c5a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+      </div>
+      <div class="card-name">Estimate System</div>
+      <div class="card-title">나의 견적서 매니저</div>
+      <div class="card-desc">촬영 및 콘텐츠 작업 견적을<br>빠르게 작성하고 공유합니다.</div>
+      <div class="card-arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </a>
+
+    <a class="service-card fade-in"
+       href="https://nongbeongi.github.io/nongdam/culture.html"
+       style="--card-accent:#4a7c9e; --card-bg:#eaf1f7;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4a7c9e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1" fill="#4a7c9e"/><circle cx="12" cy="15" r="1" fill="#4a7c9e"/><circle cx="16" cy="15" r="1" fill="#4a7c9e"/>
+        </svg>
+      </div>
+      <div class="card-name">Culture Calendar</div>
+      <div class="card-title">해남 문화달력</div>
+      <div class="card-desc">해남의 문화행사, 축제, 계절별<br>이벤트를 한눈에 확인합니다.</div>
+      <div class="card-arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </a>
+
+    <div class="service-card coming-soon fade-in" style="--card-bg:#f5f1eb;">
+      <div class="card-icon" style="background:#f0ebe2;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#c4a882" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
+      <div class="card-name">Coming soon</div>
+      <div class="card-title">새로운 서비스</div>
+      <div class="card-desc">앞으로 추가될 서비스가<br>여기에 연결됩니다.</div>
+      <span class="coming-badge">준비 중</span>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="fade-in">
+    <p>농촌을담다 · Nongdam Studio</p>
+    <p id="footerTime">—<span class="footer-dot"></span>nongbeongi.github.io</p>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  // ── 날짜 ──
+  const now = new Date();
+  const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('dateStr').textContent =
+    `${now.getFullYear()}년 ${months[now.getMonth()]} ${now.getDate()}일`;
+  document.getElementById('dayStr').textContent = days[now.getDay()];
+
+  // 시간
+  function updateTime() {
+    const t = new Date();
+    const h = String(t.getHours()).padStart(2,'0');
+    const m = String(t.getMinutes()).padStart(2,'0');
+    document.getElementById('footerTime').innerHTML =
+      `${h}:${m}<span class="footer-dot"></span>nongbeongi.github.io`;
+  }
+  updateTime();
+  setInterval(updateTime, 30000);
+
+  // ── 날씨 (Open-Meteo, 무료·키 불필요) ──
+  // 목포 위도/경도
+  const LAT = 34.8118, LON = 126.3922;
+  const WMO = {
+    0:'맑음', 1:'대체로 맑음', 2:'구름 조금', 3:'흐림',
+    45:'안개', 48:'안개', 51:'이슬비', 53:'이슬비', 55:'이슬비',
+    61:'비', 63:'비', 65:'강한 비', 71:'눈', 73:'눈', 75:'강한 눈',
+    77:'소낙눈', 80:'소나기', 81:'소나기', 82:'강한 소나기',
+    85:'눈 소나기', 86:'눈 소나기', 95:'뇌우', 96:'뇌우', 99:'뇌우'
+  };
+  const WMO_ICON = {
+    0:'☀️', 1:'🌤', 2:'⛅', 3:'☁️',
+    45:'🌫', 48:'🌫', 51:'🌦', 53:'🌦', 55:'🌧',
+    61:'🌧', 63:'🌧', 65:'🌧', 71:'❄️', 73:'❄️', 75:'❄️',
+    77:'🌨', 80:'🌦', 81:'🌧', 82:'⛈', 85:'🌨', 86:'🌨',
+    95:'⛈', 96:'⛈', 99:'⛈'
+  };
+
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode,windspeed_10m&timezone=Asia%2FSeoul`)
+    .then(r => r.json())
+    .then(d => {
+      const c = d.current;
+      const code = c.weathercode;
+      const temp = Math.round(c.temperature_2m);
+      const desc = WMO[code] || '날씨 정보';
+      const icon = WMO_ICON[code] || '🌡';
+      document.getElementById('weatherVal').innerHTML =
+        `<div style="display:flex;align-items:flex-end;gap:8px;">
+          <span class="temp-big">${temp}</span>
+          <span class="temp-unit">°C &nbsp;${icon}</span>
+        </div>
+        <div class="weather-desc">${desc} · 바람 ${Math.round(c.windspeed_10m)} km/h</div>`;
+    })
+    .catch(() => {
+      document.getElementById('weatherVal').innerHTML =
+        '<span style="color:var(--fog);font-size:.8rem;">날씨 정보를 불러올 수 없어요</span>';
+    });
+
+  // ── 오늘의 운세 (날짜 시드 기반 고정값) ──
+  const fortunes = [
+    "오늘은 씨앗을 뿌리기 좋은 날입니다.\n새로운 시작을 두려워하지 마세요.",
+    "대지가 품은 것처럼, 오늘의 노력은\n반드시 결실로 돌아옵니다.",
+    "바람이 방향을 바꾸듯, 유연하게\n상황에 적응하면 좋은 기회가 옵니다.",
+    "오늘은 멀리 보는 날입니다.\n작은 것에 집착하지 말고 큰 그림을 그리세요.",
+    "고요한 논밭처럼 마음을 비우면\n오늘 좋은 인연이 찾아옵니다.",
+    "봄비처럼 촉촉한 하루입니다.\n감사함을 표현하면 복이 돌아옵니다.",
+    "오늘은 수확하는 날입니다.\n그간의 노력이 빛을 발할 것입니다.",
+    "이슬처럼 맑은 마음으로 하루를 시작하면\n뜻밖의 행운이 따릅니다.",
+    "오늘은 협력이 힘이 되는 날입니다.\n주변 사람과의 소통에 집중해보세요.",
+    "밭갈이 전의 고요함처럼, 오늘은\n잠시 멈추고 계획을 정비하세요.",
+    "오늘 하는 일마다 순풍이 붑니다.\n자신감을 갖고 도전하세요.",
+    "땅이 씨앗을 품듯 인내하세요.\n곧 기쁜 소식이 들려올 것입니다.",
+    "오늘은 창의력이 빛나는 날입니다.\n새로운 아이디어를 적어두세요.",
+    "황금빛 들판처럼 풍요로운 하루가\n기다리고 있습니다.",
+    "오늘은 뿌리를 내리는 날입니다.\n기초를 탄탄히 다지면 흔들리지 않습니다.",
+    "맑은 하늘처럼 오늘은 시야가 트입니다.\n오래된 문제의 해결책이 보일 것입니다.",
+    "오늘은 쉬어가는 것도 전략입니다.\n잠시 여유를 누리면 에너지가 충전됩니다.",
+    "계절이 바뀌듯 변화는 자연스러운 것.\n오늘 찾아오는 변화를 기꺼이 받아들이세요.",
+    "오늘 만나는 사람이 귀인입니다.\n첫 만남에 진심을 담아보세요.",
+    "단단한 흙처럼 흔들리지 마세요.\n오늘은 굳건함이 곧 성공입니다.",
+  ];
+
+  const seed = now.getFullYear() * 10000 + (now.getMonth()+1) * 100 + now.getDate();
+  const idx = seed % fortunes.length;
+  const lines = fortunes[idx].split('\n');
+  document.getElementById('fortuneVal').innerHTML =
+    `<p class="fortune-text">${lines[0]}<br>${lines[1]}</p>`;
+})();
+</script>
+</body>
+</html>
