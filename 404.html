@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>KEEP | 잠시 점검 중이에요</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    height:100%;
+    font-family:'Noto Sans KR',Apple SD Gothic Neo,sans-serif;
+    background:#FAFAFA;
+    color:#1A1A18;
+  }
+  .wrap{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:32px 24px;
+    text-align:center;
+  }
+  .logo{
+    width:120px;
+    height:auto;
+    margin-bottom:32px;
+  }
+  .icon{
+    font-size:52px;
+    margin-bottom:20px;
+    animation:bounce 1.6s ease-in-out infinite;
+  }
+  .title{
+    font-size:20px;
+    font-weight:700;
+    color:#1A1A18;
+    margin-bottom:10px;
+    letter-spacing:-.02em;
+  }
+  .desc{
+    font-size:14px;
+    color:#888;
+    line-height:1.8;
+    margin-bottom:32px;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#E8F5EE;
+    color:#0F6E56;
+    font-size:12px;
+    font-weight:700;
+    padding:6px 14px;
+    border-radius:20px;
+    margin-bottom:32px;
+  }
+  .dot{
+    width:7px;height:7px;
+    border-radius:50%;
+    background:#1A6B3C;
+    animation:pulse 1.2s ease-in-out infinite;
+  }
+  .btn{
+    display:inline-block;
+    background:#1A6B3C;
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    padding:13px 28px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+    font-family:inherit;
+    transition:opacity .15s;
+  }
+  .btn:active{opacity:.8}
+  .footer{
+    margin-top:40px;
+    font-size:11px;
+    color:#bbb;
+  }
+  @keyframes bounce{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-8px)}
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.4;transform:scale(.7)}
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 로고 -->
+  <img class="logo"
+       src="data:image/png;base64,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"
+       alt="KEEP">
+
+  <!-- 아이콘 -->
+  <div class="icon">🔧</div>
+
+  <!-- 상태 뱃지 -->
+  <div class="badge">
+    <span class="dot"></span>
+    서비스 점검 중
+  </div>
+
+  <!-- 메시지 -->
+  <div class="title">잠시 점검 중이에요</div>
+  <div class="desc">
+    더 나은 서비스를 위해 잠시 작업 중입니다.<br>
+    조금만 기다려주시면 곧 돌아올게요. 😊
+  </div>
+
+  <!-- 새로고침 버튼 -->
+  <button class="btn" onclick="location.reload()">🔄 새로고침</button>
+
+  <div class="footer">
+    KEEP · 해남 문화달력 · 농촌을담다
+  </div>
+
+</div>
+
+<script>
+  // 30초마다 메인 페이지 접근 가능한지 확인 후 자동 이동
+  var _checkInterval = setInterval(function(){
+    fetch('/', {method:'HEAD', cache:'no-cache'})
+      .then(function(r){
+        if(r.ok){
+          clearInterval(_checkInterval);
+          location.href = '/';
+        }
+      }).catch(function(){});
+  }, 30000);
+</script>
+</body>
+</html>
