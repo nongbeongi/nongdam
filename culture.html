@@ -4935,5 +4935,218 @@ function refreshMapMarkers(){
   _doInitMap();
 }
 </script>
+<script>
+/* ════════════════════════════════════════════════════════════
+   KEEP 업그레이드 패치 v12  (제작: 농촌을담다)
+   ① 지역(시군) 추가 — GPS 자동감지 + 전환 (C안)
+   ② daily_stats 자동화 — 서버 RPC 호출로 교체
+   ④ HOT 자동선정 — 담기 상위 N개 자동 지정 버튼
+   ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
+   ════════════════════════════════════════════════════════════ */
+(function(){
+  if(window._keepPatchV12) return;   // 중복 적용 방지
+  window._keepPatchV12 = true;
+
+  /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
+  var REGION_CSS =
+    ".region-pill{display:inline-flex;align-items:center;gap:4px;background:var(--G2);color:var(--G);border:1px solid #B8E0C8;border-radius:20px;padding:5px 11px 5px 9px;font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;line-height:1;white-space:nowrap}"
+  + ".region-pill:active{background:#DDF0E3}"
+  + ".region-pill .rp-ico{font-size:12px}"
+  + ".region-pill .rp-caret{font-size:9px;opacity:.65;margin-left:1px}"
+  + "body.large .region-pill{font-size:15px;padding:7px 13px}"
+  + "#region-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:550;align-items:flex-end;justify-content:center}"
+  + "#region-sheet.open{display:flex}"
+  + ".region-sheet-inner{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:74vh;overflow-y:auto;padding:18px 18px calc(28px + env(safe-area-inset-bottom,0px));animation:slideUp .22s ease}"
+  + ".region-sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}"
+  + ".region-sheet-title{font-size:17px;font-weight:700}"
+  + ".region-sheet-sub{font-size:11px;color:var(--mu);margin-bottom:14px;line-height:1.6}"
+  + ".region-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}"
+  + ".region-item{position:relative;padding:11px 6px;border-radius:11px;border:1.5px solid var(--b1);background:var(--card);font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:500;color:var(--tx);cursor:pointer;text-align:center;transition:border-color .12s,background .12s}"
+  + ".region-item:active{border-color:var(--G)}"
+  + ".region-item.on{background:var(--G2);border-color:var(--G);color:var(--G);font-weight:700}"
+  + ".region-item.cur-loc::after{content:'\\1F4CD';position:absolute;top:3px;right:5px;font-size:9px}"
+  + "body.large .region-item{font-size:15px;padding:14px 6px}";
+  document.head.insertAdjacentHTML('beforeend','<style id="keep-region-css">'+REGION_CSS+'</style>');
+
+  /* ── 1. 지역 상태 + 함수 ───────────────────────────────── */
+  window.JN_SIGUNGU=['목포시','여수시','순천시','나주시','광양시','담양군','곡성군','구례군','고흥군','보성군','화순군','장흥군','강진군','해남군','영암군','무안군','함평군','영광군','장성군','완도군','진도군','신안군'];
+  window.currentSigungu='전체';
+  window.detectedSigungu=null;
+  window.regionMatch=function(e){return currentSigungu==='전체'||((e&&e.sigungu)||'해남군')===currentSigungu;};
+
+  window.updateRegionLabel=function(){
+    var t=currentSigungu==='전체'?'전체 지역':currentSigungu;
+    var m=document.getElementById('region-pill-label'); if(m)m.textContent=t;
+    var p=document.getElementById('region-pill-label-pc'); if(p)p.textContent='📍 '+t;
+  };
+  window.openRegionSheet=function(){
+    var grid=document.getElementById('region-grid'); if(!grid)return;
+    var avail={};
+    (window.events||[]).forEach(function(e){avail[(e&&e.sigungu)||'해남군']=1;});
+    var items=['전체'].concat(JN_SIGUNGU);
+    grid.innerHTML=items.map(function(sg){
+      var on=(sg===currentSigungu), isLoc=(sg===detectedSigungu), hasData=(sg==='전체')||avail[sg];
+      return '<button class="region-item'+(on?' on':'')+(isLoc?' cur-loc':'')+'" style="'+(hasData?'':'opacity:.4')+'" onclick="selectRegion(\''+sg+'\')">'+sg+'</button>';
+    }).join('');
+    var sub=document.getElementById('region-sheet-sub');
+    if(sub)sub.textContent=detectedSigungu?('현재 위치: '+detectedSigungu+' · 다른 지역도 볼 수 있어요'):'보고 싶은 지역을 선택하세요';
+    document.getElementById('region-sheet').classList.add('open');
+  };
+  window.closeRegionSheet=function(){var s=document.getElementById('region-sheet');if(s)s.classList.remove('open');};
+  window.selectRegion=function(sg){
+    currentSigungu=sg; updateRegionLabel(); closeRegionSheet();
+    if(typeof refreshAllViews==='function') refreshAllViews();
+    if(typeof showToast==='function') showToast(sg==='전체'?'전체 지역 행사를 표시합니다':sg+' 행사를 표시합니다');
+  };
+  window.detectMyRegion=function(){
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude, lng=pos.coords.longitude;
+      (function go(){
+        if(!window.kakao||!kakao.maps||!kakao.maps.services){setTimeout(go,400);return;}
+        var gc=new kakao.maps.services.Geocoder();
+        gc.coord2RegionCode(lng,lat,function(result,status){
+          if(status===kakao.maps.services.Status.OK&&result&&result.length){
+            var r=result.filter(function(x){return x.region_type==='H';})[0]||result[0];
+            var sgName=(r.region_2depth_name||'').trim();
+            var matched=JN_SIGUNGU.filter(function(j){return sgName===j||sgName.indexOf(j.replace(/[시군]$/,''))===0;})[0];
+            if(matched){
+              detectedSigungu=matched;
+              var hasData=(window.events||[]).some(function(e){return ((e&&e.sigungu)||'해남군')===matched;});
+              if(hasData){currentSigungu=matched;updateRegionLabel();if(typeof refreshAllViews==='function')refreshAllViews();}
+            }
+          }
+        });
+      })();
+    }, function(){}, {timeout:8000,maximumAge:600000});
+  };
+
+  /* ── 2. dbRow에 sigungu 추가 (기존 함수 감싸기) ─────────── */
+  if(typeof window.dbRow==='function'){
+    var _origDbRow=window.dbRow;
+    window.dbRow=function(e){ var r=_origDbRow(e); r.sigungu=(e&&e.sigungu)||'해남군'; return r; };
+  }
+
+  /* ── 3. 지역 필터 적용 (getByDate / pubEvents 감싸기) ───── */
+  if(typeof window.getByDate==='function'){
+    var _origGetByDate=window.getByDate;
+    window.getByDate=function(d,y,m){ return _origGetByDate(d,y,m).filter(regionMatch); };
+  }
+  if(typeof window.pubEvents==='function'){
+    var _origPubEvents=window.pubEvents;
+    window.pubEvents=function(){ return _origPubEvents().filter(regionMatch); };
+  }
+
+  /* ── 4. SELECT에 sigungu 포함해 재로드 (있으면 사용, 없으면 자동 폴백) ── */
+  window.loadEvents=function(){
+    function addMonth(y,m1,delta){var d=new Date(y,m1-1+delta,1);return{y:d.getFullYear(),m:d.getMonth()+1};}
+    var curM1=TODAY_M+1;
+    var months=[addMonth(TODAY_Y,curM1,-1),addMonth(TODAY_Y,curM1,0),addMonth(TODAY_Y,curM1,1)];
+    function run(withSig){
+      var sel='id,title,status,start_date,end_date,start_time,place_name,target_audience,price,is_free,contact,host_org,description,is_featured,save_count,event_year,event_month,lat,lng,'+(withSig?'sigungu,':'')+'categories(code,name_ko),event_saves(count)';
+      return Promise.all(months.map(function(mo){
+        return sbGet('events?select='+sel+'&event_year=eq.'+mo.y+'&event_month=eq.'+mo.m+'&order=start_date.asc');
+      }));
+    }
+    return run(true).catch(function(){return run(false);}).then(function(results){
+      var combined=[].concat.apply([],results.map(function(r){return r||[];}));
+      var seen={}; combined=combined.filter(function(e){if(seen[e.id])return false;seen[e.id]=1;return true;});
+      window.events=combined.map(dbRow);
+    }).catch(function(e){console.warn('loadEvents(patch) 실패:',e);});
+  };
+
+  /* ── 5. daily_stats 자동화 — 서버 RPC 호출로 교체 ───────── */
+  window.upsertDailyStat=function(){
+    var ds=(typeof todayStr==='function')?todayStr():(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
+    var k='hnc_v_'+ds, ran=false;
+    try{ran=!!localStorage.getItem(k);}catch(e){}
+    if(ran) return;                       // 같은 기기 당일 1회만
+    try{localStorage.setItem(k,'1');}catch(e){}
+    fetch(SUPABASE_URL+'/rest/v1/rpc/refresh_daily_stats',{
+      method:'POST', headers:sbH(), body:JSON.stringify({target_date:ds})
+    }).catch(function(){});
+  };
+
+  /* ── 6. HOT 자동선정 — 담기 상위 N개 자동 지정 ──────────── */
+  window.autoAssignHot=function(n){
+    n=n||3;
+    var base=(typeof pubEvents==='function'?pubEvents():[]).filter(function(e){return e.year===TODAY_Y&&e.month===TODAY_M;});
+    var todayN=TODAY_Y*10000+(TODAY_M+1)*100+TODAY;
+    var live=base.filter(function(e){
+      var em=(e.endMonth!=null)?e.endMonth:e.month;
+      var endN=(e.endYear||e.year)*10000+(em+1)*100+(e.end||e.date);
+      return endN>=todayN;
+    });
+    var ranked=live.filter(function(e){return (e.saves||0)>0;}).sort(function(a,b){return (b.saves||0)-(a.saves||0);});
+    var top=ranked.slice(0,n);
+    if(!top.length){ if(typeof showToast==='function')showToast('담기 데이터가 있는 행사가 없어요'); return; }
+    var msg='담기 상위 '+top.length+'개를 HOT으로 지정할까요?\n\n'+top.map(function(e,i){return (i+1)+'. '+e.title+' (♥'+e.saves+')';}).join('\n');
+    if(!confirm(msg)) return;
+    Promise.all(top.map(function(e){
+      e.featured=true;
+      return sbPatch('events?id=eq.'+e.id,{is_featured:true,featured_at:new Date().toISOString()});
+    })).then(function(){
+      if(typeof showToast==='function')showToast('✅ 상위 '+top.length+'개를 HOT으로 지정했어요');
+      if(typeof renderHotMgr==='function')renderHotMgr();
+      if(typeof buildHot==='function')buildHot();
+      if(typeof buildCal==='function')buildCal();
+      if(typeof renderAdmMgr==='function')renderAdmMgr();
+      if(window._isPC&&typeof renderPcDash==='function')renderPcDash();
+    }).catch(function(err){ if(typeof showToast==='function')showToast('⚠ 자동 지정 실패: '+(err&&err.message||err)); });
+  };
+
+  /* ── 7. UI 주입 (지역 버튼 · 시트 · HOT 버튼) ───────────── */
+  function injectUI(){
+    // 모바일 상단바 지역 버튼
+    var mIcons=document.querySelector('.m-top-row .m-icons');
+    if(mIcons && !document.getElementById('region-pill-mob')){
+      mIcons.insertAdjacentHTML('beforebegin',
+        '<button class="region-pill" id="region-pill-mob" onclick="openRegionSheet()" aria-label="지역 선택">'
+        +'<span class="rp-ico">📍</span><span id="region-pill-label">전체 지역</span><span class="rp-caret">▾</span></button>');
+    }
+    // PC 상단바 지역 버튼
+    var pcDateLbl=document.getElementById('pc-date-lbl');
+    if(pcDateLbl && !document.getElementById('region-pill-pc')){
+      pcDateLbl.insertAdjacentHTML('beforebegin',
+        '<button class="pc-pill" id="region-pill-pc" onclick="openRegionSheet()" style="background:rgba(124,185,160,.2);color:#9FE0BC">'
+        +'<span id="region-pill-label-pc">📍 전체 지역</span> ▾</button>');
+    }
+    // 지역 선택 시트
+    if(!document.getElementById('region-sheet')){
+      document.body.insertAdjacentHTML('beforeend',
+        '<div id="region-sheet" onclick="if(event.target===this)closeRegionSheet()">'
+        +'<div class="region-sheet-inner">'
+        +'<div class="region-sheet-hd"><div class="region-sheet-title">지역 선택</div>'
+        +'<button class="modal-close" style="position:static" onclick="closeRegionSheet()">✕</button></div>'
+        +'<div class="region-sheet-sub" id="region-sheet-sub">보고 싶은 지역을 선택하세요</div>'
+        +'<div class="region-grid" id="region-grid"></div></div></div>');
+    }
+    // HOT 자동선정 버튼 (관리자 HOT 탭)
+    var hotSec=document.getElementById('adm-hot');
+    if(hotSec && !document.getElementById('auto-hot-btn')){
+      var guide=hotSec.querySelector('div');
+      var btn='<button id="auto-hot-btn" onclick="autoAssignHot(3)" style="width:100%;margin-bottom:12px;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#F5A623,#E0700F);color:#fff;font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:700;cursor:pointer">⚡ 담기 상위 3개 자동 HOT 지정</button>';
+      if(guide) guide.insertAdjacentHTML('afterend',btn);
+    }
+    updateRegionLabel();
+  }
+
+  /* ── 8. 시작 ───────────────────────────────────────────── */
+  function boot(){
+    injectUI();
+    // sigungu 포함해서 다시 로드 → 화면 갱신
+    if(typeof loadEvents==='function'){
+      loadEvents().then(function(){ if(typeof refreshAllViews==='function')refreshAllViews(); });
+    }
+    // GPS 지역 감지 (카카오 services 준비될 때까지 내부에서 대기)
+    detectMyRegion();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,300);});
+  } else {
+    setTimeout(boot,300);
+  }
+})();
+</script>
 </body>
 </html>
