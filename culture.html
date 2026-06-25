@@ -4946,17 +4946,18 @@ function refreshMapMarkers(){
    ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
    ════════════════════════════════════════════════════════════ */
 (function(){
-  if(window._keepPatchV13) return;   // 중복 적용 방지
-  window._keepPatchV13 = true;
+  if(window._keepPatchV14) return;   // 중복 적용 방지
+  window._keepPatchV14 = true;
 
   /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
   var REGION_CSS =
-    ".region-pill{display:inline-flex;align-items:center;gap:4px;background:var(--G2);color:var(--G);border:1px solid #B8E0C8;border-radius:20px;padding:5px 11px 5px 9px;font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;line-height:1;white-space:nowrap}"
-  + ".region-pill:active{background:#DDF0E3}"
+    ".region-pill{display:inline-flex;align-items:center;gap:5px;background:var(--G2);color:var(--G);border:1px solid #C2E3CE;border-radius:18px;padding:6px 12px 6px 10px;font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,box-shadow .15s;line-height:1;white-space:nowrap;box-shadow:0 1px 2px rgba(26,107,60,.07)}"
+  + ".region-pill:active{background:#DCEFE2;box-shadow:none}"
   + ".region-pill .rp-ico{font-size:12px}"
-  + ".region-pill .rp-caret{font-size:9px;opacity:.65;margin-left:1px}"
-  + "body.large .region-pill{font-size:15px;padding:7px 13px}"
-  + "#region-pill-mob{margin-left:8px;margin-right:auto}"
+  + ".region-pill .rp-caret{font-size:10px;opacity:.6;margin-left:1px}"
+  + "body.large .region-pill{font-size:15px;padding:8px 14px}"
+  + "#region-pill-mob{margin-left:10px;margin-right:auto}"
+  + ".m-top-row{gap:6px}"
   + "#region-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:550;align-items:flex-end;justify-content:center}"
   + "#region-sheet.open{display:flex}"
   + ".region-sheet-inner{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:74vh;overflow-y:auto;padding:18px 18px calc(28px + env(safe-area-inset-bottom,0px));animation:slideUp .22s ease}"
