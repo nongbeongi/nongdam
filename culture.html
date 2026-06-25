@@ -4946,8 +4946,8 @@ function refreshMapMarkers(){
    ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
    ════════════════════════════════════════════════════════════ */
 (function(){
-  if(window._keepPatchV14) return;   // 중복 적용 방지
-  window._keepPatchV14 = true;
+  if(window._keepPatchV15) return;   // 중복 적용 방지
+  window._keepPatchV15 = true;
 
   /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
   var REGION_CSS =
@@ -4956,8 +4956,8 @@ function refreshMapMarkers(){
   + ".region-pill .rp-ico{font-size:12px}"
   + ".region-pill .rp-caret{font-size:10px;opacity:.6;margin-left:1px}"
   + "body.large .region-pill{font-size:15px;padding:8px 14px}"
-  + "#region-pill-mob{margin-left:10px;margin-right:auto}"
-  + ".m-top-row{gap:6px}"
+  + ".m-top-row{justify-content:flex-start!important;gap:8px}"
+  + ".m-top-row .m-icons{margin-left:auto}"
   + "#region-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:550;align-items:flex-end;justify-content:center}"
   + "#region-sheet.open{display:flex}"
   + ".region-sheet-inner{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:74vh;overflow-y:auto;padding:18px 18px calc(28px + env(safe-area-inset-bottom,0px));animation:slideUp .22s ease}"
@@ -4986,8 +4986,8 @@ function refreshMapMarkers(){
     var t=currentSigungu;
     ['region-pill-label','region-pill-label-adm'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=t;});
     ['region-pill-label-pc','region-pill-label-pcadm'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='📍 '+t;});
-    // 등록폼 시군구 select 동기화
-    ['reg-sigungu-mob','reg-sigungu-pc'].forEach(function(id){var s=document.getElementById(id);if(s)s.value=t;});
+    // 등록폼 안내문구 동기화
+    ['reg-region-note-mob','reg-region-note-pc'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=t;});
   };
   window.openRegionSheet=function(){
     var grid=document.getElementById('region-grid'); if(!grid)return;
@@ -5107,13 +5107,8 @@ function refreshMapMarkers(){
     }).catch(function(err){ if(el) el.innerHTML='<div style="padding:14px;text-align:center;color:#E04070">⚠ 조회 실패: '+(err&&err.message||err)+'</div>'; });
   }
 
-  /* ── 6. 등록 시 sigungu 자동 주입 (모든 등록 경로: 개별/OCR/엑셀/요청승인) ── */
-  function _pickRegSigungu(){
-    var id=window._isPC?'reg-sigungu-pc':'reg-sigungu-mob';
-    var sel=document.getElementById(id);
-    if(sel&&sel.value) return sel.value;
-    return currentSigungu||'해남군';
-  }
+  /* ── 6. 등록 시 sigungu 자동 주입 (모든 등록 경로) — 항상 상단 시군구 기준 ── */
+  function _pickRegSigungu(){ return currentSigungu||'해남군'; }
   if(typeof window.sbPost==='function'){
     var _origSbPost=window.sbPost;
     window.sbPost=function(path,data){
@@ -5207,21 +5202,17 @@ function refreshMapMarkers(){
         +'<div class="region-sheet-sub" id="region-sheet-sub">관리할 시군구를 선택하세요</div>'
         +'<div class="region-grid" id="region-grid"></div></div></div>');
     }
-    // (모바일) 개별 등록폼 시군구 선택칸
+    // (모바일) 개별 등록폼 — 시군구 안내문구 (셀렉 없음, 상단 기준)
     var upSingle=document.getElementById('up-single');
-    if(upSingle && !document.getElementById('reg-sigungu-mob')){
+    if(upSingle && !document.getElementById('reg-region-note-mob')){
       upSingle.insertAdjacentHTML('afterbegin',
-        '<div class="form-field"><div class="form-label">지역(시군구) <span class="req">필수</span></div>'
-        +'<select class="form-input" id="reg-sigungu-mob">'+_sigOptions()+'</select>'
-        +'<div class="form-hint">선택한 시군구로 등록됩니다 (기본: 현재 지역)</div></div>');
+        '<div style="font-size:12px;color:var(--G);background:var(--G2);border:1px solid #C2E3CE;border-radius:8px;padding:9px 12px;line-height:1.6;margin-bottom:12px">📍 <b id="reg-region-note-mob">'+currentSigungu+'</b> 행사로 등록됩니다 · 다른 지역은 상단 시군구를 바꿔주세요</div>');
     }
-    // (PC) 개별 등록폼 시군구 선택칸
-    var pcForm=document.querySelector('#up-pc-single .pc-form');
-    if(pcForm && !document.getElementById('reg-sigungu-pc')){
-      pcForm.insertAdjacentHTML('afterbegin',
-        '<div class="form-field full"><div class="form-label">지역(시군구) <span class="req">필수</span></div>'
-        +'<select class="form-input" id="reg-sigungu-pc">'+_sigOptions()+'</select>'
-        +'<div class="form-hint">선택한 시군구로 등록됩니다 (기본: 현재 지역)</div></div>');
+    // (PC) 개별 등록폼 — 시군구 안내문구
+    var pcBody=document.querySelector('#up-pc-single .pc-card-body');
+    if(pcBody && !document.getElementById('reg-region-note-pc')){
+      pcBody.insertAdjacentHTML('afterbegin',
+        '<div style="font-size:13px;color:var(--G);background:var(--G2);border:1px solid #C2E3CE;border-radius:8px;padding:10px 14px;line-height:1.6;margin-bottom:14px">📍 <b id="reg-region-note-pc">'+currentSigungu+'</b> 행사로 등록됩니다 · 다른 지역은 상단 시군구를 바꿔주세요</div>');
     }
     // HOT 자동선정 버튼 (관리자 HOT 탭)
     var hotSec=document.getElementById('adm-hot');
