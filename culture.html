@@ -4938,15 +4938,16 @@ function refreshMapMarkers(){
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   KEEP 업그레이드 패치 v12  (제작: 농촌을담다)
-   ① 지역(시군) 추가 — GPS 자동감지 + 전환 (C안)
+   KEEP 업그레이드 패치 v13  (제작: 농촌을담다)
+   ① 지역(시군) 추가 — GPS 자동감지 + 시군구별 분리
    ② daily_stats 자동화 — 서버 RPC 호출로 교체
-   ④ HOT 자동선정 — 담기 상위 N개 자동 지정 버튼
+   ④ HOT 자동선정 — 담기 상위 N개 자동 지정
+   ⑤ 등록·관리·HOT 시군구별 분리 / 등록폼 시군구 선택 / 기본값=현재 시군구
    ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
    ════════════════════════════════════════════════════════════ */
 (function(){
-  if(window._keepPatchV12) return;   // 중복 적용 방지
-  window._keepPatchV12 = true;
+  if(window._keepPatchV13) return;   // 중복 적용 방지
+  window._keepPatchV13 = true;
 
   /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
   var REGION_CSS =
@@ -4972,33 +4973,38 @@ function refreshMapMarkers(){
 
   /* ── 1. 지역 상태 + 함수 ───────────────────────────────── */
   window.JN_SIGUNGU=['목포시','여수시','순천시','나주시','광양시','담양군','곡성군','구례군','고흥군','보성군','화순군','장흥군','강진군','해남군','영암군','무안군','함평군','영광군','장성군','완도군','진도군','신안군'];
-  window.currentSigungu='전체';
+  window.currentSigungu='해남군';   // 기본값 = 해남군 (전체 옵션 없음)
   window.detectedSigungu=null;
-  window.regionMatch=function(e){return currentSigungu==='전체'||((e&&e.sigungu)||'해남군')===currentSigungu;};
+  window.regionMatch=function(e){ return ((e&&e.sigungu)||'해남군')===currentSigungu; };
+
+  function _sigOptions(){
+    return JN_SIGUNGU.map(function(sg){return '<option value="'+sg+'"'+(sg===currentSigungu?' selected':'')+'>'+sg+'</option>';}).join('');
+  }
 
   window.updateRegionLabel=function(){
-    var t=currentSigungu==='전체'?'전체 지역':currentSigungu;
-    var m=document.getElementById('region-pill-label'); if(m)m.textContent=t;
-    var p=document.getElementById('region-pill-label-pc'); if(p)p.textContent='📍 '+t;
+    var t=currentSigungu;
+    ['region-pill-label','region-pill-label-adm'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=t;});
+    ['region-pill-label-pc','region-pill-label-pcadm'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='📍 '+t;});
+    // 등록폼 시군구 select 동기화
+    ['reg-sigungu-mob','reg-sigungu-pc'].forEach(function(id){var s=document.getElementById(id);if(s)s.value=t;});
   };
   window.openRegionSheet=function(){
     var grid=document.getElementById('region-grid'); if(!grid)return;
     var avail={};
     (window.events||[]).forEach(function(e){avail[(e&&e.sigungu)||'해남군']=1;});
-    var items=['전체'].concat(JN_SIGUNGU);
-    grid.innerHTML=items.map(function(sg){
-      var on=(sg===currentSigungu), isLoc=(sg===detectedSigungu), hasData=(sg==='전체')||avail[sg];
-      return '<button class="region-item'+(on?' on':'')+(isLoc?' cur-loc':'')+'" style="'+(hasData?'':'opacity:.4')+'" onclick="selectRegion(\''+sg+'\')">'+sg+'</button>';
+    grid.innerHTML=JN_SIGUNGU.map(function(sg){
+      var on=(sg===currentSigungu), isLoc=(sg===detectedSigungu), hasData=!!avail[sg];
+      return '<button class="region-item'+(on?' on':'')+(isLoc?' cur-loc':'')+'" style="'+(hasData?'':'opacity:.45')+'" onclick="selectRegion(\''+sg+'\')">'+sg+'</button>';
     }).join('');
     var sub=document.getElementById('region-sheet-sub');
-    if(sub)sub.textContent=detectedSigungu?('현재 위치: '+detectedSigungu+' · 다른 지역도 볼 수 있어요'):'보고 싶은 지역을 선택하세요';
+    if(sub)sub.textContent=detectedSigungu?('현재 위치: '+detectedSigungu+' · 다른 시군구도 선택할 수 있어요'):'관리할 시군구를 선택하세요';
     document.getElementById('region-sheet').classList.add('open');
   };
   window.closeRegionSheet=function(){var s=document.getElementById('region-sheet');if(s)s.classList.remove('open');};
   window.selectRegion=function(sg){
     currentSigungu=sg; updateRegionLabel(); closeRegionSheet();
     if(typeof refreshAllViews==='function') refreshAllViews();
-    if(typeof showToast==='function') showToast(sg==='전체'?'전체 지역 행사를 표시합니다':sg+' 행사를 표시합니다');
+    if(typeof showToast==='function') showToast(sg+' 기준으로 표시합니다');
   };
   window.detectMyRegion=function(){
     if(!navigator.geolocation) return;
@@ -5014,8 +5020,9 @@ function refreshMapMarkers(){
             var matched=JN_SIGUNGU.filter(function(j){return sgName===j||sgName.indexOf(j.replace(/[시군]$/,''))===0;})[0];
             if(matched){
               detectedSigungu=matched;
-              var hasData=(window.events||[]).some(function(e){return ((e&&e.sigungu)||'해남군')===matched;});
-              if(hasData){currentSigungu=matched;updateRegionLabel();if(typeof refreshAllViews==='function')refreshAllViews();}
+              currentSigungu=matched;             // 현재 위치 시군구를 기본 선택
+              updateRegionLabel();
+              if(typeof refreshAllViews==='function')refreshAllViews();
             }
           }
         });
@@ -5057,19 +5064,81 @@ function refreshMapMarkers(){
     }).catch(function(e){console.warn('loadEvents(patch) 실패:',e);});
   };
 
-  /* ── 5. daily_stats 자동화 — 서버 RPC 호출로 교체 ───────── */
+  /* ── 5. 관리 목록 시군구별 분리 (서버에서 해당 시군구만 조회) ── */
+  window.renderAdmMgr=function(){
+    var y=admYearFilter>0?admYearFilter:0, m=admMonthFilter>0?admMonthFilter:0;
+    if(y>0||m>0){ _fetchAndRenderAdmMgr(y,m); }
+    else { _renderAdmMgrFromData((window.events||[]).filter(regionMatch)); }
+  };
+  window._fetchAndRenderAdmMgr=function(year,month){
+    var el=document.getElementById('adm-mgr-list');
+    if(el) el.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu)">📡 조회 중...</div>';
+    _fetchMgr(year,month,'adm');
+  };
+  window.renderPcMgr=function(){
+    var y=admYearFilter>0?admYearFilter:0, m=admMonthFilter>0?admMonthFilter:0;
+    if(y>0||m>0){ _fetchAndRenderPcMgr(y,m); }
+    else { _renderPcMgrFromData((window.events||[]).filter(regionMatch)); }
+  };
+  window._fetchAndRenderPcMgr=function(year,month){
+    var el=document.getElementById('pc-mgr-list');
+    if(el) el.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu)">📡 조회 중...</div>';
+    _fetchMgr(year,month,'pc');
+  };
+  function _fetchMgr(year,month,which){
+    var listId=(which==='pc')?'pc-mgr-list':'adm-mgr-list';
+    var el=document.getElementById(listId);
+    function build(withSig){
+      var qs='events?select=id,title,status,start_date,end_date,start_time,place_name,target_audience,price,is_free,contact,host_org,description,is_featured,save_count,event_year,event_month,lat,lng,'+(withSig?'sigungu,':'')+'categories(code,name_ko),event_saves(count)';
+      if(year>0) qs+='&event_year=eq.'+year;
+      if(month>0) qs+='&event_month=eq.'+month;
+      if(withSig) qs+='&sigungu=eq.'+encodeURIComponent(currentSigungu);
+      qs+='&order=start_date.asc';
+      return sbGet(qs);
+    }
+    build(true).catch(function(){return build(false);}).then(function(rows){
+      if(!rows||!rows.length){ if(el) el.innerHTML='<div style="padding:14px;text-align:center;color:var(--mu)">'+currentSigungu+'에 해당 조건의 행사 없음</div>'; return; }
+      var data=rows.map(dbRow);
+      if(typeof admSF!=='undefined'&&admSF) data=data.filter(function(e){return e.status===admSF;});
+      if(typeof admQ!=='undefined'&&admQ) data=data.filter(function(e){return e.title.toLowerCase().includes(admQ.toLowerCase());});
+      if(which==='pc') _renderPcMgrFromData(data); else _renderAdmMgrFromData(data);
+      rows.forEach(function(e){if(!events.find(function(x){return x.id===e.id;}))events.push(dbRow(e));});
+    }).catch(function(err){ if(el) el.innerHTML='<div style="padding:14px;text-align:center;color:#E04070">⚠ 조회 실패: '+(err&&err.message||err)+'</div>'; });
+  }
+
+  /* ── 6. 등록 시 sigungu 자동 주입 (모든 등록 경로: 개별/OCR/엑셀/요청승인) ── */
+  function _pickRegSigungu(){
+    var id=window._isPC?'reg-sigungu-pc':'reg-sigungu-mob';
+    var sel=document.getElementById(id);
+    if(sel&&sel.value) return sel.value;
+    return currentSigungu||'해남군';
+  }
+  if(typeof window.sbPost==='function'){
+    var _origSbPost=window.sbPost;
+    window.sbPost=function(path,data){
+      try{
+        if(typeof path==='string' && path.indexOf('events')===0 && data && typeof data==='object'
+           && data.title && data.start_date && !data.sigungu){
+          data.sigungu=_pickRegSigungu();   // 없으면 현재 시군구(=기본 해남군)로
+        }
+      }catch(e){}
+      return _origSbPost(path,data);
+    };
+  }
+
+  /* ── 7. daily_stats 자동화 — 서버 RPC 호출로 교체 ───────── */
   window.upsertDailyStat=function(){
     var ds=(typeof todayStr==='function')?todayStr():(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
     var k='hnc_v_'+ds, ran=false;
     try{ran=!!localStorage.getItem(k);}catch(e){}
-    if(ran) return;                       // 같은 기기 당일 1회만
+    if(ran) return;
     try{localStorage.setItem(k,'1');}catch(e){}
     fetch(SUPABASE_URL+'/rest/v1/rpc/refresh_daily_stats',{
       method:'POST', headers:sbH(), body:JSON.stringify({target_date:ds})
     }).catch(function(){});
   };
 
-  /* ── 6. HOT 자동선정 — 담기 상위 N개 자동 지정 ──────────── */
+  /* ── 8. HOT 자동선정 — 담기 상위 N개 (현재 시군구 기준) ──── */
   window.autoAssignHot=function(n){
     n=n||3;
     var base=(typeof pubEvents==='function'?pubEvents():[]).filter(function(e){return e.year===TODAY_Y&&e.month===TODAY_M;});
@@ -5081,8 +5150,8 @@ function refreshMapMarkers(){
     });
     var ranked=live.filter(function(e){return (e.saves||0)>0;}).sort(function(a,b){return (b.saves||0)-(a.saves||0);});
     var top=ranked.slice(0,n);
-    if(!top.length){ if(typeof showToast==='function')showToast('담기 데이터가 있는 행사가 없어요'); return; }
-    var msg='담기 상위 '+top.length+'개를 HOT으로 지정할까요?\n\n'+top.map(function(e,i){return (i+1)+'. '+e.title+' (♥'+e.saves+')';}).join('\n');
+    if(!top.length){ if(typeof showToast==='function')showToast(currentSigungu+': 담기 데이터가 있는 행사가 없어요'); return; }
+    var msg='['+currentSigungu+'] 담기 상위 '+top.length+'개를 HOT으로 지정할까요?\n\n'+top.map(function(e,i){return (i+1)+'. '+e.title+' (♥'+e.saves+')';}).join('\n');
     if(!confirm(msg)) return;
     Promise.all(top.map(function(e){
       e.featured=true;
@@ -5097,50 +5166,78 @@ function refreshMapMarkers(){
     }).catch(function(err){ if(typeof showToast==='function')showToast('⚠ 자동 지정 실패: '+(err&&err.message||err)); });
   };
 
-  /* ── 7. UI 주입 (지역 버튼 · 시트 · HOT 버튼) ───────────── */
+  /* ── 9. UI 주입 ─────────────────────────────────────────── */
   function injectUI(){
-    // 모바일 상단바 지역 버튼
+    // (모바일) 메인 상단바 지역 버튼 — 로고 옆
     var mIcons=document.querySelector('.m-top-row .m-icons');
     if(mIcons && !document.getElementById('region-pill-mob')){
       mIcons.insertAdjacentHTML('beforebegin',
-        '<button class="region-pill" id="region-pill-mob" onclick="openRegionSheet()" aria-label="지역 선택">'
-        +'<span class="rp-ico">📍</span><span id="region-pill-label">전체 지역</span><span class="rp-caret">▾</span></button>');
+        '<button class="region-pill" id="region-pill-mob" onclick="openRegionSheet()" aria-label="시군구 선택">'
+        +'<span class="rp-ico">📍</span><span id="region-pill-label">해남군</span><span class="rp-caret">▾</span></button>');
     }
-    // PC 상단바 지역 버튼
+    // (모바일) 관리자 상단바 지역 버튼
+    var admLogo=document.querySelector('#adm-mob .adm-logo');
+    if(admLogo && !document.getElementById('region-pill-adm')){
+      admLogo.insertAdjacentHTML('afterend',
+        '<button class="region-pill" id="region-pill-adm" onclick="openRegionSheet()" style="margin-left:10px;background:rgba(124,185,160,.18);color:#9FE0BC;border-color:rgba(124,185,160,.4)">'
+        +'<span class="rp-ico">📍</span><span id="region-pill-label-adm">해남군</span><span class="rp-caret">▾</span></button>');
+    }
+    // (PC) 이용자 상단바 지역 버튼
     var pcDateLbl=document.getElementById('pc-date-lbl');
     if(pcDateLbl && !document.getElementById('region-pill-pc')){
       pcDateLbl.insertAdjacentHTML('beforebegin',
         '<button class="pc-pill" id="region-pill-pc" onclick="openRegionSheet()" style="background:rgba(124,185,160,.2);color:#9FE0BC">'
-        +'<span id="region-pill-label-pc">📍 전체 지역</span> ▾</button>');
+        +'<span id="region-pill-label-pc">📍 해남군</span> ▾</button>');
+    }
+    // (PC) 관리자 상단바 지역 버튼
+    var pcAdmBar=document.getElementById('pc-adm-bar');
+    if(pcAdmBar && !document.getElementById('region-pill-pcadm')){
+      pcAdmBar.insertAdjacentHTML('afterbegin',
+        '<button class="pc-pill" id="region-pill-pcadm" onclick="openRegionSheet()" style="background:rgba(124,185,160,.2);color:#9FE0BC">'
+        +'<span id="region-pill-label-pcadm">📍 해남군</span> ▾</button>');
     }
     // 지역 선택 시트
     if(!document.getElementById('region-sheet')){
       document.body.insertAdjacentHTML('beforeend',
         '<div id="region-sheet" onclick="if(event.target===this)closeRegionSheet()">'
         +'<div class="region-sheet-inner">'
-        +'<div class="region-sheet-hd"><div class="region-sheet-title">지역 선택</div>'
+        +'<div class="region-sheet-hd"><div class="region-sheet-title">시군구 선택</div>'
         +'<button class="modal-close" style="position:static" onclick="closeRegionSheet()">✕</button></div>'
-        +'<div class="region-sheet-sub" id="region-sheet-sub">보고 싶은 지역을 선택하세요</div>'
+        +'<div class="region-sheet-sub" id="region-sheet-sub">관리할 시군구를 선택하세요</div>'
         +'<div class="region-grid" id="region-grid"></div></div></div>');
+    }
+    // (모바일) 개별 등록폼 시군구 선택칸
+    var upSingle=document.getElementById('up-single');
+    if(upSingle && !document.getElementById('reg-sigungu-mob')){
+      upSingle.insertAdjacentHTML('afterbegin',
+        '<div class="form-field"><div class="form-label">지역(시군구) <span class="req">필수</span></div>'
+        +'<select class="form-input" id="reg-sigungu-mob">'+_sigOptions()+'</select>'
+        +'<div class="form-hint">선택한 시군구로 등록됩니다 (기본: 현재 지역)</div></div>');
+    }
+    // (PC) 개별 등록폼 시군구 선택칸
+    var pcForm=document.querySelector('#up-pc-single .pc-form');
+    if(pcForm && !document.getElementById('reg-sigungu-pc')){
+      pcForm.insertAdjacentHTML('afterbegin',
+        '<div class="form-field full"><div class="form-label">지역(시군구) <span class="req">필수</span></div>'
+        +'<select class="form-input" id="reg-sigungu-pc">'+_sigOptions()+'</select>'
+        +'<div class="form-hint">선택한 시군구로 등록됩니다 (기본: 현재 지역)</div></div>');
     }
     // HOT 자동선정 버튼 (관리자 HOT 탭)
     var hotSec=document.getElementById('adm-hot');
     if(hotSec && !document.getElementById('auto-hot-btn')){
       var guide=hotSec.querySelector('div');
-      var btn='<button id="auto-hot-btn" onclick="autoAssignHot(3)" style="width:100%;margin-bottom:12px;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#F5A623,#E0700F);color:#fff;font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:700;cursor:pointer">⚡ 담기 상위 3개 자동 HOT 지정</button>';
+      var btn='<button id="auto-hot-btn" onclick="autoAssignHot(3)" style="width:100%;margin-bottom:12px;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#F5A623,#E0700F);color:#fff;font-family:Noto Sans KR,sans-serif;font-size:13px;font-weight:700;cursor:pointer">⚡ 담기 상위 3개 자동 HOT 지정 (현재 시군구)</button>';
       if(guide) guide.insertAdjacentHTML('afterend',btn);
     }
     updateRegionLabel();
   }
 
-  /* ── 8. 시작 ───────────────────────────────────────────── */
+  /* ── 10. 시작 ──────────────────────────────────────────── */
   function boot(){
     injectUI();
-    // sigungu 포함해서 다시 로드 → 화면 갱신
     if(typeof loadEvents==='function'){
       loadEvents().then(function(){ if(typeof refreshAllViews==='function')refreshAllViews(); });
     }
-    // GPS 지역 감지 (카카오 services 준비될 때까지 내부에서 대기)
     detectMyRegion();
   }
   if(document.readyState==='loading'){
