@@ -4946,8 +4946,8 @@ function refreshMapMarkers(){
    ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
    ════════════════════════════════════════════════════════════ */
 (function(){
-  if(window._keepPatchV16) return;   // 중복 적용 방지
-  window._keepPatchV16 = true;
+  if(window._keepPatchV17) return;   // 중복 적용 방지
+  window._keepPatchV17 = true;
 
   /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
   var REGION_CSS =
@@ -4958,8 +4958,7 @@ function refreshMapMarkers(){
   + "body.large .region-pill{font-size:15px;padding:8px 14px}"
   + ".m-top-row{justify-content:flex-start!important;gap:8px}"
   + ".m-top-row .m-icons{margin-left:auto}"
-  + "#region-pill-mob{flex:1 1 auto}"
-  + "#region-pill-mob .rp-caret{margin-left:auto}"
+  + "#region-pill-mob{flex:0 0 auto;max-width:170px}"
   + "#region-sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:9600;align-items:flex-end;justify-content:center}"
   + "#region-sheet.open{display:flex}"
   + ".region-sheet-inner{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:74vh;overflow-y:auto;padding:18px 18px calc(28px + env(safe-area-inset-bottom,0px));animation:slideUp .22s ease}"
