@@ -4946,8 +4946,8 @@ function refreshMapMarkers(){
    ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
    ════════════════════════════════════════════════════════════ */
 (function(){
-  if(window._keepPatchV18) return;   // 중복 적용 방지
-  window._keepPatchV18 = true;
+  if(window._keepPatchV19) return;   // 중복 적용 방지
+  window._keepPatchV19 = true;
 
   /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
   var REGION_CSS =
@@ -5020,10 +5020,14 @@ function refreshMapMarkers(){
             var sgName=(r.region_2depth_name||'').trim();
             var matched=JN_SIGUNGU.filter(function(j){return sgName===j||sgName.indexOf(j.replace(/[시군]$/,''))===0;})[0];
             if(matched){
-              detectedSigungu=matched;
-              currentSigungu=matched;             // 현재 위치 시군구를 기본 선택
-              updateRegionLabel();
-              if(typeof refreshAllViews==='function')refreshAllViews();
+              detectedSigungu=matched;            // 시트의 📍 현재위치 표시는 항상 갱신
+              // 데이터가 있는 시군일 때만 자동 전환 (없으면 해남군 기본 유지 → 빈 화면 방지)
+              var hasData=(window.events||[]).some(function(e){return ((e&&e.sigungu)||'해남군')===matched;});
+              if(hasData){
+                currentSigungu=matched;
+                updateRegionLabel();
+                if(typeof refreshAllViews==='function')refreshAllViews();
+              }
             }
           }
         });
@@ -5101,7 +5105,7 @@ function refreshMapMarkers(){
       if(!rows||!rows.length){ if(el) el.innerHTML='<div style="padding:14px;text-align:center;color:var(--mu)">'+currentSigungu+'에 해당 조건의 행사 없음</div>'; return; }
       var data=rows.map(dbRow);
       if(typeof admSF!=='undefined'&&admSF) data=data.filter(function(e){return e.status===admSF;});
-      if(typeof admQ!=='undefined'&&admQ) data=data.filter(function(e){return e.title.toLowerCase().includes(admQ.toLowerCase());});
+      if(typeof admQ!=='undefined'&&admQ) data=data.filter(function(e){return (e.title||'').toLowerCase().includes(admQ.toLowerCase());});
       if(which==='pc') _renderPcMgrFromData(data); else _renderAdmMgrFromData(data);
       rows.forEach(function(e){if(!events.find(function(x){return x.id===e.id;}))events.push(dbRow(e));});
     }).catch(function(err){ if(el) el.innerHTML='<div style="padding:14px;text-align:center;color:#E04070">⚠ 조회 실패: '+(err&&err.message||err)+'</div>'; });
