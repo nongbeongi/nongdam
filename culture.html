@@ -4946,8 +4946,8 @@ function refreshMapMarkers(){
    ※ 기존 코드는 한 줄도 수정하지 않습니다. 전부 "덮어쓰기"로 동작.
    ════════════════════════════════════════════════════════════ */
 (function(){
-  if(window._keepPatchV19) return;   // 중복 적용 방지
-  window._keepPatchV19 = true;
+  if(window._keepPatchV20) return;   // 중복 적용 방지
+  window._keepPatchV20 = true;
 
   /* ── 0. 지역 선택 CSS 주입 ─────────────────────────────── */
   var REGION_CSS =
@@ -5007,6 +5007,15 @@ function refreshMapMarkers(){
     if(typeof refreshAllViews==='function') refreshAllViews();
     if(typeof showToast==='function') showToast(sg+' 기준으로 표시합니다');
   };
+  window._maybeSwitchToDetected=function(){
+    if(!detectedSigungu || detectedSigungu===currentSigungu) return;
+    var hasData=(window.events||[]).some(function(e){return ((e&&e.sigungu)||'해남군')===detectedSigungu;});
+    if(hasData){
+      currentSigungu=detectedSigungu;
+      updateRegionLabel();
+      if(typeof refreshAllViews==='function')refreshAllViews();
+    }
+  };
   window.detectMyRegion=function(){
     if(!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(function(pos){
@@ -5020,14 +5029,8 @@ function refreshMapMarkers(){
             var sgName=(r.region_2depth_name||'').trim();
             var matched=JN_SIGUNGU.filter(function(j){return sgName===j||sgName.indexOf(j.replace(/[시군]$/,''))===0;})[0];
             if(matched){
-              detectedSigungu=matched;            // 시트의 📍 현재위치 표시는 항상 갱신
-              // 데이터가 있는 시군일 때만 자동 전환 (없으면 해남군 기본 유지 → 빈 화면 방지)
-              var hasData=(window.events||[]).some(function(e){return ((e&&e.sigungu)||'해남군')===matched;});
-              if(hasData){
-                currentSigungu=matched;
-                updateRegionLabel();
-                if(typeof refreshAllViews==='function')refreshAllViews();
-              }
+              detectedSigungu=matched;            // 감지 결과 저장(시트 📍 표시용)
+              _maybeSwitchToDetected();           // 데이터 있으면 전환 (없으면 보류)
             }
           }
         });
@@ -5228,13 +5231,48 @@ function refreshMapMarkers(){
     updateRegionLabel();
   }
 
+  /* ── 9.5 현장 진단 (#diag 또는 콘솔 keepDiag()) ─────────── */
+  window.keepDiag=function(){
+    var L=[];
+    L.push('① 위치기능: '+(navigator.geolocation?'있음':'❌없음'));
+    var hasSvc=!!(window.kakao&&kakao.maps&&kakao.maps.services);
+    L.push('② 카카오 maps:'+(window.kakao&&kakao.maps?'O':'❌X')+' / services:'+(hasSvc?'O ✅':'❌X ← 이거면 원인!'));
+    var byReg={}; (window.events||[]).forEach(function(e){var s=(e&&e.sigungu)||'해남군';byReg[s]=(byReg[s]||0)+1;});
+    L.push('③ 행사 '+((window.events||[]).length)+'건 / 지역별: '+JSON.stringify(byReg));
+    L.push('④ 현재선택:'+currentSigungu+' / 감지됨:'+(detectedSigungu||'(아직)'));
+    if(!navigator.geolocation){alert(L.join('\n'));return;}
+    alert(L.join('\n')+'\n\n⑤ 확인 누르면 GPS 측정 시작');
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude,lng=pos.coords.longitude;
+      var o=['GPS좌표: '+lat.toFixed(4)+', '+lng.toFixed(4)];
+      if(!(window.kakao&&kakao.maps&&kakao.maps.services)){
+        o.push('','❌ kakao.maps.services 없음 → 좌표→지역 변환 불가');
+        o.push('해결: HTML의 카카오 SDK <script src> 끝에');
+        o.push('&libraries=services 를 추가하세요');
+        alert(o.join('\n'));return;
+      }
+      new kakao.maps.services.Geocoder().coord2RegionCode(lng,lat,function(res,st){
+        if(st!==kakao.maps.services.Status.OK){o.push('❌변환실패 status='+st);alert(o.join('\n'));return;}
+        var r=res.filter(function(x){return x.region_type==='H';})[0]||res[0];
+        var d1=(r.region_1depth_name||'').trim(), d2=(r.region_2depth_name||'').trim();
+        o.push('변환결과: '+d1+' '+d2);
+        var m=JN_SIGUNGU.filter(function(j){return d2===j||d2.indexOf(j.replace(/[시군]$/,''))===0;})[0];
+        o.push('전남 시군 매칭: '+(m||'❌없음(전남 밖이거나 이름 불일치)'));
+        if(m){var hd=(window.events||[]).some(function(e){return ((e&&e.sigungu)||'해남군')===m;});
+          o.push('해당 지역 데이터: '+(hd?'있음 → 전환됨 ✅':'없음 → 전환보류(빈화면방지)'));}
+        alert(o.join('\n'));
+      });
+    },function(err){alert('❌GPS실패: code='+(err&&err.code)+' '+(err&&err.message||''));},{timeout:10000,maximumAge:0});
+  };
+
   /* ── 10. 시작 ──────────────────────────────────────────── */
   function boot(){
     injectUI();
     if(typeof loadEvents==='function'){
-      loadEvents().then(function(){ if(typeof refreshAllViews==='function')refreshAllViews(); });
+      loadEvents().then(function(){ if(typeof refreshAllViews==='function')refreshAllViews(); _maybeSwitchToDetected(); });
     }
     detectMyRegion();
+    if((location.hash||'').indexOf('diag')>=0) setTimeout(window.keepDiag,1400);
   }
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,300);});
